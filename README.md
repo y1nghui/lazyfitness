@@ -33,40 +33,18 @@ Install and run:
 
 ```bash
 pip install -r requirements.txt
-python manage.py makemigrations
+python manage.py makemigrations accounts gym_user coach health_advisor admin_panel
 python manage.py migrate
-python manage.py seed_demo
 python manage.py runserver
+
+To create superuser
+(this is for your login into the database by http://127.0.0.1:8000/django-admin):
+python manage.py createsuperuser
+
 ```
 
 Open: <http://127.0.0.1:8000/>
 
-## Demo seed data
-
-Run:
-
-```bash
-python manage.py seed_demo
-```
-
-The command is safe to run more than once. It creates or refreshes demo users, profiles, assignments, goals, schedules, activity logs, messages, workout plans, diet reports, diet plans, recommendations, login activity, and system logs.
-
-Demo password for all seeded accounts:
-
-```text
-LazyDemo123!
-```
-
-Demo accounts:
-
-| Role | Username | Email |
-|---|---|---|
-| Admin | `demo_admin` | `demo_admin@lazyfitness.test` |
-| Coach | `coach_strength` | `coach_strength@lazyfitness.test` |
-| Health Advisor | `advisor_nutrition` | `advisor_nutrition@lazyfitness.test` |
-| Gym User | `gym_alex` | `gym_alex@lazyfitness.test` |
-
-Users can login with either username or email.
 
 ## Important URLs
 
@@ -152,7 +130,6 @@ Admins can export:
 python manage.py check
 python manage.py makemigrations --check --dry-run
 python manage.py migrate --noinput
-python manage.py seed_demo
 python manage.py test
 ```
 
