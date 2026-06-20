@@ -41,32 +41,6 @@ python manage.py runserver
 
 Open: <http://127.0.0.1:8000/>
 
-## Demo seed data
-
-Run:
-
-```bash
-python manage.py seed_demo
-```
-
-The command is safe to run more than once. It creates or refreshes demo users, profiles, assignments, goals, schedules, activity logs, messages, workout plans, diet reports, diet plans, recommendations, login activity, and system logs.
-
-Demo password for all seeded accounts:
-
-```text
-LazyDemo123!
-```
-
-Demo accounts:
-
-| Role | Username | Email |
-|---|---|---|
-| Admin | `demo_admin` | `demo_admin@lazyfitness.test` |
-| Coach | `coach_strength` | `coach_strength@lazyfitness.test` |
-| Health Advisor | `advisor_nutrition` | `advisor_nutrition@lazyfitness.test` |
-| Gym User | `gym_alex` | `gym_alex@lazyfitness.test` |
-
-Users can login with either username or email.
 
 ## Important URLs
 
