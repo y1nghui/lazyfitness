@@ -35,7 +35,6 @@ Install and run:
 pip install -r requirements.txt
 python manage.py makemigrations
 python manage.py migrate
-python manage.py seed_demo
 python manage.py runserver
 ```
 
@@ -126,7 +125,6 @@ Admins can export:
 python manage.py check
 python manage.py makemigrations --check --dry-run
 python manage.py migrate --noinput
-python manage.py seed_demo
 python manage.py test
 ```
 
