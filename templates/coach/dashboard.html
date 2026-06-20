@@ -4,10 +4,30 @@
 {% block content %}
 <h2 class="section-title">Coach Dashboard — {{ coach.coach_name }}</h2>
 <div class="row g-3 mb-4">
-  <div class="col-md-3"><div class="card p-3"><span class="text-secondary">Assigned Users</span><h3>{{ assigned_count }}</h3></div></div>
-  <div class="col-md-3"><div class="card p-3"><span class="text-secondary">Plans</span><h3>{{ plan_count }}</h3></div></div>
-  <div class="col-md-3"><div class="card p-3"><span class="text-secondary">Workouts</span><h3>{{ workout_count }}</h3></div></div>
-  <div class="col-md-3"><div class="card p-3"><span class="text-secondary">Exercises</span><h3>{{ exercise_count }}</h3></div></div>
+  <div class="col-md-3">
+    <div class="card p-3">
+      <span class="text-secondary">Assigned Users</span>
+      <h3>{{ assigned_count }}</h3>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card p-3">
+      <span class="text-secondary">Plans</span>
+      <h3>{{ plan_count }}</h3>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card p-3">
+      <span class="text-secondary">Workouts</span>
+      <h3>{{ workout_count }}</h3>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card p-3">
+      <span class="text-secondary">Exercises</span>
+      <h3>{{ exercise_count }}</h3>
+    </div>
+  </div>
 </div>
 <div class="row g-4">
   <div class="col-lg-4">

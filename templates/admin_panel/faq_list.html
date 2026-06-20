@@ -1,3 +1,28 @@
 {% extends "shared/base.html" %}
 {% block title %}FAQ — LazyFitness{% endblock %}
-{% block content %}<div class="d-flex justify-content-between align-items-center mb-3"><h2 class="section-title mb-0">FAQ Management</h2><a class="btn btn-primary" href="{% url 'admin_panel:faq_create' %}">New FAQ</a></div><div class="accordion" id="faqAccordion">{% for faq in faqs %}<div class="accordion-item bg-dark text-light border-secondary"><h2 class="accordion-header"><button class="accordion-button collapsed bg-dark text-light" type="button" data-lf-toggle="collapse" data-lf-target="#faq{{ faq.id }}">{{ faq.question }}</button></h2><div id="faq{{ faq.id }}" class="accordion-collapse collapse" data-lf-parent="#faqAccordion"><div class="accordion-body"><p>{{ faq.answer|linebreaksbr }}</p><a class="btn btn-sm btn-outline-light" href="{% url 'admin_panel:faq_edit' faq.id %}">Edit</a> <a class="btn btn-sm btn-danger" href="{% url 'admin_panel:faq_delete' faq.id %}">Delete</a></div></div></div>{% empty %}<div class="card p-4 text-center text-secondary">No FAQ entries yet.</div>{% endfor %}</div>{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="section-title mb-0">FAQ Management</h2>
+    <a class="btn btn-primary" href="{% url 'admin_panel:faq_create' %}">New FAQ</a>
+</div>
+<div class="accordion" id="faqAccordion">
+    {% for faq in faqs %}
+    <div class="accordion-item bg-dark text-light border-secondary">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed bg-dark text-light" type="button" data-lf-toggle="collapse" data-lf-target="#faq{{ faq.id }}">
+                {{ faq.question }}
+            </button>
+        </h2>
+        <div id="faq{{ faq.id }}" class="accordion-collapse collapse" data-lf-parent="#faqAccordion">
+            <div class="accordion-body">
+                <p>{{ faq.answer|linebreaksbr }}</p>
+                <a class="btn btn-sm btn-outline-light" href="{% url 'admin_panel:faq_edit' faq.id %}">Edit</a>
+                <a class="btn btn-sm btn-danger" href="{% url 'admin_panel:faq_delete' faq.id %}">Delete</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="card p-4 text-center text-secondary">No FAQ entries yet.</div>
+    {% endfor %}
+</div>
+{% endblock %}

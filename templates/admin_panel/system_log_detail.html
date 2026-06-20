@@ -1,3 +1,13 @@
 {% extends "shared/base.html" %}
 {% block title %}System Log — LazyFitness{% endblock %}
-{% block content %}<div class="card p-4"><h2 class="section-title">{{ log.get_event_display }}</h2><p><strong>Time:</strong> {{ log.timestamp|date:"d M Y, h:i A" }}</p><p><strong>Module:</strong> {{ log.module|default:"—" }}</p><p><strong>Performed by:</strong> {% if log.performed_by %}{{ log.performed_by.email }}{% else %}System{% endif %}</p><hr><p>{{ log.description }}</p><a class="btn btn-outline-light" href="{% url 'admin_panel:system_log_list' %}">Back to Logs</a></div>{% endblock %}
+{% block content %}
+<div class="card p-4">
+    <h2 class="section-title">{{ log.get_event_display }}</h2>
+    <p><strong>Time:</strong> {{ log.timestamp|date:"d M Y, h:i A" }}</p>
+    <p><strong>Module:</strong> {{ log.module|default:"—" }}</p>
+    <p><strong>Performed by:</strong> {% if log.performed_by %}{{ log.performed_by.email }}{% else %}System{% endif %}</p>
+    <hr>
+    <p>{{ log.description }}</p>
+    <a class="btn btn-outline-light" href="{% url 'admin_panel:system_log_list' %}">Back to Logs</a>
+</div>
+{% endblock %}

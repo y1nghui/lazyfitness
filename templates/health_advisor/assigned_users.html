@@ -5,11 +5,93 @@
 <div class="card p-3 mb-3"><form method="get" class="row g-2 align-items-end"><div class="col-md-3"><label class="form-label">Search</label><input class="form-control" name="q" value="{{ search }}"></div><div class="col-md-2"><label class="form-label">BMI</label><select name="bmi" class="form-select"><option value="">All</option>{% for cat in bmi_categories %}<option value="{{ cat }}" {% if bmi_filter == cat %}selected{% endif %}>{{ cat }}</option>{% endfor %}</select></div><div class="col-md-2"><label class="form-label">Unread</label><select name="unread" class="form-select"><option value="">Any</option><option value="yes" {% if unread_filter == 'yes' %}selected{% endif %}>Has unread</option><option value="no" {% if unread_filter == 'no' %}selected{% endif %}>No unread</option></select></div><div class="col-md-2"><label class="form-label">Diet Plan</label><select name="report" class="form-select"><option value="">Any</option><option value="yes" {% if report_filter == 'yes' %}selected{% endif %}>Has plan</option><option value="no" {% if report_filter == 'no' %}selected{% endif %}>No plan</option></select></div><div class="col-md-2"><label class="form-label">Recommendation</label><select name="rec_status" class="form-select"><option value="">Any</option>{% for value,label in recommendation_status_choices %}<option value="{{ value }}" {% if rec_status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div><div class="col-md-1"><button class="btn btn-primary w-100">Go</button></div></form></div>
 <div class="row g-3">
 {% for row in rows %}
-  <div class="col-lg-6"><div class="card p-3 h-100"><div class="d-flex justify-content-between align-items-start"><div class="d-flex gap-2 align-items-center">{% if row.gym_user.user.profile_picture %}<img src="{{ row.gym_user.user.profile_picture.url }}" class="rounded-circle avatar-sm" alt="{{ row.gym_user.user_name }}">{% else %}<span class="avatar-initial-sm">{{ row.gym_user.user.avatar_initial }}</span>{% endif %}<div><strong>{{ row.gym_user.user_name }}</strong><div class="small text-secondary">@{{ row.gym_user.user.username }}</div></div></div>{% if row.unread_count %}<span class="badge bg-danger">{{ row.unread_count }} unread</span>{% endif %}</div><div class="row g-2 my-3"><div class="col"><div class="small text-secondary">BMI</div>{{ row.bmi|default:"—" }} <span class="badge bg-secondary">{{ row.bmi_category }}</span></div><div class="col"><div class="small text-secondary">Diet Plan</div>{% if row.latest_diet_plan %}{{ row.latest_diet_plan.title }}{% else %}<span class="text-secondary">None</span>{% endif %}</div><div class="col"><div class="small text-secondary">Recommendation</div>{% if row.latest_recommendation %}{{ row.latest_recommendation.get_status_display }}{% else %}<span class="text-secondary">None</span>{% endif %}</div></div><div class="d-flex flex-wrap gap-2 mt-auto"><a class="btn btn-sm btn-outline-light" href="{% url 'health_advisor:user_profile' row.gym_user.pk %}">View Details</a><button class="btn btn-sm btn-primary" data-lf-toggle="offcanvas" data-lf-target="#msg{{ row.gym_user.pk }}">Message</button><button class="btn btn-sm btn-outline-warning" data-lf-toggle="offcanvas" data-lf-target="#rec{{ row.gym_user.pk }}">Recommend</button><button class="btn btn-sm btn-outline-success" data-lf-toggle="offcanvas" data-lf-target="#diet{{ row.gym_user.pk }}">Diet Plan</button></div></div></div>
-  <div class="offcanvas offcanvas-end" tabindex="-1" id="msg{{ row.gym_user.pk }}"><div class="offcanvas-header"><h5>Message {{ row.gym_user.user_name }}</h5><button class="btn-close btn-close-white" data-lf-dismiss="offcanvas"></button></div><div class="offcanvas-body"><p class="text-secondary">Send a quick care-team message. Visible to {{ row.gym_user.user_name }}, you, and the assigned coach.</p><p class="small">Coach: {% if row.gym_user.assigned_coach %}<strong>{{ row.gym_user.assigned_coach.coach_name }}</strong>{% else %}<span class="text-secondary">Not assigned</span>{% endif %}</p>{% if row.recent_messages %}<div class="mini-chat mb-3">{% for msg in row.recent_messages reversed %}<div class="chat-row {% if msg.sender_id == request.user.id %}chat-row-out{% else %}chat-row-in{% endif %}"><div class="chat-bubble small"><strong>{{ msg.sender.display_name }}</strong><br>{% if msg.body %}{{ msg.body|truncatewords:16 }}{% endif %}{% if msg.attachment %}<div><a href="{{ msg.attachment.url }}" target="_blank">Attachment</a></div>{% endif %}<div class="text-secondary">{{ msg.created_at|date:"d M H:i" }}</div></div></div>{% endfor %}</div>{% else %}<div class="empty-state mb-3">No recent messages.</div>{% endif %}{% if row.gym_user.assigned_coach %}<form method="post" enctype="multipart/form-data" action="{% url 'health_advisor:message_thread' row.gym_user.pk %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><textarea class="form-control mb-2" name="body" rows="3" placeholder="Write a message..."></textarea><input class="form-control mb-2" type="file" name="attachment"><div class="d-flex gap-2"><button class="btn btn-primary">Send</button><a class="btn btn-outline-light" href="{% url 'health_advisor:message_thread' row.gym_user.pk %}">Full Chat</a></div></form>{% else %}<a class="btn btn-outline-light" href="{% url 'health_advisor:message_thread' row.gym_user.pk %}">Open Chat</a>{% endif %}</div></div>
-  <div class="offcanvas offcanvas-end" tabindex="-1" id="rec{{ row.gym_user.pk }}"><div class="offcanvas-header"><h5>Recommendation for {{ row.gym_user.user_name }}</h5><button class="btn-close btn-close-white" data-lf-dismiss="offcanvas"></button></div><div class="offcanvas-body"><p class="text-secondary">Create advice for this gym user. Status starts as <strong>Unread</strong> and changes only when the user reads/completes/dismisses it.</p>{% if row.latest_recommendation %}<p class="small">Latest: <strong>{{ row.latest_recommendation.subject }}</strong> · {{ row.latest_recommendation.get_status_display }}</p>{% endif %}<form method="post" action="{% url 'health_advisor:recommendation_send' row.gym_user.pk %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><div class="mb-2"><label class="form-label">Subject</label><input class="form-control" name="subject" required></div><div class="mb-2"><label class="form-label">Advice / content</label><textarea class="form-control" name="advice" rows="5" required></textarea></div><button class="btn btn-primary">Send Recommendation</button> <a class="btn btn-outline-light" href="{% url 'health_advisor:recommendation_send' row.gym_user.pk %}">Full Page</a></form></div></div>
-  <div class="offcanvas offcanvas-end" tabindex="-1" id="diet{{ row.gym_user.pk }}"><div class="offcanvas-header"><h5>Quick Diet Plan</h5><button class="btn-close btn-close-white" data-lf-dismiss="offcanvas"></button></div><div class="offcanvas-body"><p class="text-secondary">Quick-add a practical diet plan for <strong>{{ row.gym_user.user_name }}</strong>. Use the full page for detailed dates and longer notes.</p>{% if row.latest_diet_plan %}<p class="small">Latest plan: <strong>{{ row.latest_diet_plan.title }}</strong> · {{ row.latest_diet_plan.get_status_display }}</p>{% endif %}<form method="post" action="{% url 'health_advisor:diet_plan_update' row.gym_user.pk %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><input type="hidden" name="gym_user" value="{{ row.gym_user.pk }}"><input type="hidden" name="status" value="active"><div class="mb-2"><label class="form-label">Title</label><input class="form-control" name="title" required></div><div class="mb-2"><label class="form-label">Target goal</label><input class="form-control" name="target_goal"></div><div class="mb-2"><label class="form-label">Daily calories</label><input class="form-control" type="number" min="1" name="daily_calorie_target"></div><div class="mb-2"><label class="form-label">Meal notes</label><textarea class="form-control" name="meal_notes" rows="4"></textarea></div><div class="mb-2"><label class="form-label">Restrictions / allergies</label><textarea class="form-control" name="restrictions_allergies" rows="2"></textarea></div><button class="btn btn-primary">Save Diet Plan</button> <a class="btn btn-outline-light" href="{% url 'health_advisor:diet_plan_update' row.gym_user.pk %}">Full Page</a></form></div></div>
-{% empty %}<div class="col-12"><div class="empty-state">No assigned users match your filters.</div></div>{% endfor %}
-</div>
+  <div class="col-lg-6">
+    <div class="card p-3 h-100">
+      <div class="d-flex justify-content-between align-items-start">
+        <div class="d-flex gap-2 align-items-center">
+          {% if row.gym_user.user.profile_picture %}
+          <img src="{{ row.gym_user.user.profile_picture.url }}" class="rounded-circle avatar-sm" alt="{{ row.gym_user.user_name }}">
+          {% else %}
+          <span class="avatar-initial-sm">
+            {{ row.gym_user.user.avatar_initial }}
+          </span>
+          {% endif %}
+          <div>
+            <strong>{{ row.gym_user.user_name }}</strong>
+            <div class="small text-secondary">@{{ row.gym_user.user.username }}</div>
+          </div>
+        </div>
+        {% if row.unread_count %}
+        <span class="badge bg-danger">{{ row.unread_count }} unread</span>
+        {% endif %}</div>
+        <div class="row g-2 my-3">
+          <div class="col">
+            <div class="small text-secondary">BMI</div>
+            {{ row.bmi|default:"—" }} 
+            <span class="badge bg-secondary">{{ row.bmi_category }}</span>
+          </div>
+          <div class="col">
+            <div class="small text-secondary">Diet Plan</div>
+            {% if row.latest_diet_plan %}{{ row.latest_diet_plan.title }}
+            {% else %}<span class="text-secondary">None</span>
+            {% endif %}</div>
+            <div class="col">
+              <div class="small text-secondary">Recommendation</div>
+              {% if row.latest_recommendation %}{{ row.latest_recommendation.get_status_display }}
+              {% else %}<span class="text-secondary">None</span>{% endif %}</div>
+            </div>
+            <div class="d-flex flex-wrap gap-2 mt-auto">
+              <a class="btn btn-sm btn-outline-light" href="{% url 'health_advisor:user_profile' row.gym_user.pk %}">View Details</a>
+              <button class="btn btn-sm btn-primary" data-lf-toggle="offcanvas" data-lf-target="#msg{{ row.gym_user.pk }}">Message</button>
+              <button class="btn btn-sm btn-outline-warning" data-lf-toggle="offcanvas" data-lf-target="#rec{{ row.gym_user.pk }}">Recommend</button>
+              <button class="btn btn-sm btn-outline-success" data-lf-toggle="offcanvas" data-lf-target="#diet{{ row.gym_user.pk }}">Diet Plan</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="msg{{ row.gym_user.pk }}">
+    <div class="offcanvas-header">
+      <h5>Message {{ row.gym_user.user_name }}</h5>
+      <button class="btn-close btn-close-white" data-lf-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+      <p class="text-secondary">Send a quick care-team message. Visible to {{ row.gym_user.user_name }}, you, and the assigned coach.</p>
+      <p class="small">Coach: {% if row.gym_user.assigned_coach %}<strong>{{ row.gym_user.assigned_coach.coach_name }}</strong>{% else %}<span class="text-secondary">Not assigned</span>{% endif %}</p>
+      {% if row.recent_messages %}
+        <div class="mini-chat mb-3">
+          {% for msg in row.recent_messages reversed %}
+            <div class="chat-row {% if msg.sender_id == request.user.id %}chat-row-out{% else %}chat-row-in{% endif %}">
+              <div class="chat-bubble small">
+                <strong>{{ msg.sender.display_name }}</strong><br>
+                {% if msg.body %}{{ msg.body|truncatewords:16 }}{% endif %}
+                {% if msg.attachment %}
+                  <div><a href="{{ msg.attachment.url }}" target="_blank">Attachment</a></div>
+                {% endif %}
+                <div class="text-secondary">{{ msg.created_at|date:"d M H:i" }}</div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state mb-3">No recent messages.</div>
+      {% endif %}
+      {% if row.gym_user.assigned_coach %}
+        <form method="post" enctype="multipart/form-data" action="{% url 'health_advisor:message_thread' row.gym_user.pk %}">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <textarea class="form-control mb-2" name="body" rows="3" placeholder="Write a message..."></textarea>
+          <input class="form-control mb-2" type="file" name="attachment">
+          <div class="d-flex gap-2">
+            <button class="btn btn-primary">Send</button>
+            <a class="btn btn-outline-light" href="{% url 'health_advisor:message_thread' row.gym_user.pk %}">Full Chat</a>
+          </div>
+        </form>
+      {% else %}
+        <a class="btn btn-outline-light" href="{% url 'health_advisor:message_thread' row.gym_user.pk %}">Open Chat</a>
+      {% endif %}
+    </div>
+  </div>
 {% include 'shared/pagination.html' %}
 {% endblock %}

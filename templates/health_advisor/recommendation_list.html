@@ -1,7 +1,26 @@
 {% extends "shared/base.html" %}
 {% block title %}Recommendations — LazyFitness{% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3"><h2 class="section-title mb-0">Recommendations</h2><a class="btn btn-outline-light" href="{% url 'health_advisor:assigned_users' %}">Assigned Users</a></div>
-<div class="card p-3 mb-3"><form method="get" class="row g-2 align-items-end"><div class="col-md-10"><label class="form-label">Recommendation status</label><select name="status" class="form-select"><option value="">All statuses</option>{% for value,label in status_choices %}<option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div><div class="col-md-2"><button class="btn btn-primary w-100">Filter</button></div></form></div>
-<div class="card p-3"><div class="table-responsive"><table class="table table-dark"><thead><tr><th>User</th><th>Subject</th><th>Status</th><th>Date</th><th></th></tr></thead><tbody>{% for rec in recommendations %}<tr><td>{{ rec.gym_user.user_name }}</td><td>{{ rec.subject }}</td><td><span class="badge bg-info text-dark">{{ rec.get_status_display }}</span></td><td>{{ rec.created_at|date:"d M Y, h:i A" }}</td><td><a class="btn btn-sm btn-outline-warning" href="{% url 'health_advisor:recommendation_edit' rec.pk %}">Edit Content</a></td></tr>{% empty %}<tr><td colspan="5"><div class="empty-state">No recommendations yet.</div></td></tr>{% endfor %}</tbody></table></div>{% include 'shared/pagination.html' %}</div>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="section-title mb-0">Recommendations</h2>
+    <a class="btn btn-outline-light" href="{% url 'health_advisor:assigned_users' %}">Assigned Users</a>
+</div>
+<div class="card p-3 mb-3">
+    <form method="get" class="row g-2 align-items-end">
+        <div class="col-md-10">
+            <label class="form-label">Recommendation status</label>
+            <select name="status" class="form-select">
+                <option value="">All statuses</option>
+                {% for value,label in status_choices %}
+                    <option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-primary w-100">Filter</button>
+        </div>
+    </form>
+</div>
+<div class="card p-3">
+    <div class="table-responsive"><table class="table table-dark"><thead><tr><th>User</th><th>Subject</th><th>Status</th><th>Date</th><th></th></tr></thead><tbody>{% for rec in recommendations %}<tr><td>{{ rec.gym_user.user_name }}</td><td>{{ rec.subject }}</td><td><span class="badge bg-info text-dark">{{ rec.get_status_display }}</span></td><td>{{ rec.created_at|date:"d M Y, h:i A" }}</td><td><a class="btn btn-sm btn-outline-warning" href="{% url 'health_advisor:recommendation_edit' rec.pk %}">Edit Content</a></td></tr>{% empty %}<tr><td colspan="5"><div class="empty-state">No recommendations yet.</div></td></tr>{% endfor %}</tbody></table></div>{% include 'shared/pagination.html' %}</div>
 {% endblock %}

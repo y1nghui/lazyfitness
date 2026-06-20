@@ -3,5 +3,65 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3 btn-toolbar-mobile"><h2 class="section-title mb-0">User Management</h2><a class="btn btn-primary" href="{% url 'admin_panel:user_add' %}">Add User</a></div>
 <div class="card p-3 mb-3"><form method="get" class="row g-2 align-items-end"><div class="col-md-3"><label class="form-label">Search</label><input class="form-control" name="q" value="{{ search }}"></div><div class="col-md-2"><label class="form-label">Role</label><select class="form-select" name="role"><option value="">All</option>{% for value,label in role_choices %}<option value="{{ value }}" {% if role_filter == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div><div class="col-md-2"><label class="form-label">Status</label><select class="form-select" name="status"><option value="">All</option><option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option><option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option></select></div><div class="col-md-3"><label class="form-label">Gym user assignment</label><select class="form-select" name="assignment"><option value="">Any assignment</option>{% for value,label in assignment_choices %}<option value="{{ value }}" {% if assignment_filter == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div><div class="col-md-2"><button class="btn btn-primary w-100">Filter</button></div></form></div>
-<div class="card p-3"><div class="table-responsive"><table class="table table-dark table-hover align-middle"><thead><tr><th>User</th><th>Role</th><th>Status</th><th>Coach</th><th>Advisor</th><th>Latest Login</th><th>Actions</th></tr></thead><tbody>{% for row in user_rows %}<tr><td><strong>{{ row.user.username }}</strong><div class="small text-secondary">{{ row.user.email }}</div></td><td>{{ row.user.get_role_display }}</td><td>{% if row.user.is_active %}<span class="badge bg-success">Active</span>{% else %}<span class="badge bg-secondary">Inactive</span>{% endif %}</td><td>{% if row.profile %}{{ row.profile.assigned_coach.coach_name|default:"No coach assigned" }}{% else %}<span class="text-secondary">—</span>{% endif %}</td><td>{% if row.profile %}{{ row.profile.assigned_advisor.advisor_name|default:"No health advisor assigned" }}{% else %}<span class="text-secondary">—</span>{% endif %}</td><td>{{ row.user.latest_login_at|default:"—" }}</td><td class="text-nowrap"><a class="btn btn-sm btn-outline-light" href="{% url 'admin_panel:user_detail' row.user.pk %}">View</a>{% if row.user.is_gym_user %}<a class="btn btn-sm btn-primary" href="{% url 'admin_panel:user_assign' row.user.pk %}?next={{ request.get_full_path|urlencode }}">Assign</a>{% endif %}</td></tr>{% empty %}<tr><td colspan="7"><div class="empty-state">No users match your filters.</div></td></tr>{% endfor %}</tbody></table></div>{% include 'shared/pagination.html' %}</div>
-{% endblock %}
+<div class="card p-3">
+    <div class="table-responsive">
+        <table class="table table-dark table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Coach</th>
+                    <th>Advisor</th>
+                    <th>Latest Login</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in user_rows %}
+                <tr>
+                    <td>
+                        <strong>{{ row.user.username }}</strong>
+                        <div class="small text-secondary">{{ row.user.email }}</div>
+                    </td>
+                    <td>{{ row.user.get_role_display }}</td>
+                    <td>
+                        {% if row.user.is_active %}
+                        <span class="badge bg-success">Active</span>
+                        {% else %}<span class="badge bg-secondary">Inactive</span>
+                        {% endif %}
+                    </td>
+                        <td>
+                            {% if row.profile %}
+                            {{ row.profile.assigned_coach.coach_name|default:"No coach assigned" }}
+                            {% else %}
+                            <span class="text-secondary">—</span>
+                            {% endif %}
+                        </td>
+                            <td>{% if row.profile %}
+                                {{ row.profile.assigned_advisor.advisor_name|default:"No health advisor assigned" }}
+                                {% else %}
+                                <span class="text-secondary">—</span>
+                                {% endif %}
+                            </td>
+                                <td>{{ row.user.latest_login_at|default:"—" }}</td>
+                                <td class="text-nowrap">
+                                    <a class="btn btn-sm btn-outline-light" href="{% url 'admin_panel:user_detail' row.user.pk %}">View</a>
+                                    {% if row.user.is_gym_user %}
+                                    <a class="btn btn-sm btn-primary" href="{% url 'admin_panel:user_assign' row.user.pk %}?next={{ request.get_full_path|urlencode }}">Assign</a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="7">
+                                    <div class="empty-state">No users match your filters.</div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% include 'shared/pagination.html' %}
+        </div>
+    {% endblock %}

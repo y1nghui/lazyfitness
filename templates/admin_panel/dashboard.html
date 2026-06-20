@@ -3,10 +3,30 @@
 {% block content %}
 <h2 class="section-title">Admin Dashboard</h2>
 <div class="row g-3 mb-4">
-  <div class="col-md-3"><div class="card p-3 metric-card"><span class="text-secondary">Total Users</span><h3>{{ total_users }}</h3></div></div>
-  <div class="col-md-3"><div class="card p-3 metric-card"><span class="text-secondary">Active Users</span><h3>{{ active_users }}</h3></div></div>
-  <div class="col-md-3"><div class="card p-3 metric-card"><span class="text-secondary">Assigned Gym Users</span><h3>{{ assigned_gym_users }}</h3></div></div>
-  <div class="col-md-3"><div class="card p-3 metric-card"><span class="text-secondary">Need Assignment</span><h3>{{ unassigned_gym_users }}</h3></div></div>
+  <div class="col-md-3">
+    <div class="card p-3 metric-card">
+      <span class="text-secondary">Total Users</span>
+      <h3>{{ total_users }}</h3>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card p-3 metric-card">
+      <span class="text-secondary">Active Users</span>
+      <h3>{{ active_users }}</h3>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card p-3 metric-card">
+      <span class="text-secondary">Assigned Gym Users</span>
+      <h3>{{ assigned_gym_users }}</h3>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card p-3 metric-card">
+      <span class="text-secondary">Need Assignment</span>
+      <h3>{{ unassigned_gym_users }}</h3>
+    </div>
+  </div>
 </div>
 <div class="row g-4">
   <div class="col-lg-6"><div class="card p-3"><h5>Quick Admin Actions</h5><div class="d-flex flex-wrap gap-2"><a class="btn btn-primary" href="{% url 'admin_panel:user_list' %}?role=gym_user&assignment=both_missing">Find unassigned users</a><a class="btn btn-outline-light" href="{% url 'admin_panel:user_add' %}">Add User</a><a class="btn btn-outline-light" href="{% url 'admin_panel:login_activity_list' %}">Login Activity</a></div></div></div>

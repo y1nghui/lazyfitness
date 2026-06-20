@@ -1,1 +1,17 @@
-{% extends "shared/base.html" %}{% block title %}Delete Exercise — LazyFitness{% endblock %}{% block content %}<div class="row justify-content-center"><div class="col-lg-6"><div class="card p-4"><h2 class="section-title">Delete Exercise</h2><p>Are you sure you want to delete <strong>{{ exercise }}</strong>?</p><form method="post">{% csrf_token %}<button class="btn btn-danger">Delete</button><a class="btn btn-outline-light" href="{% if exercise.plan %}{% url 'coach:plan_detail' exercise.plan.id %}{% else %}{% url 'coach:plan_list' %}{% endif %}">Cancel</a></form></div></div></div>{% endblock %}
+{% extends "shared/base.html" %}
+{% block title %}Delete Exercise — LazyFitness{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card p-4">
+            <h2 class="section-title">Delete Exercise</h2>
+            <p>Are you sure you want to delete <strong>{{ exercise }}</strong>?</p>
+            <form method="post">
+                {% csrf_token %}
+                <button class="btn btn-danger">Delete</button>
+                <a class="btn btn-outline-light" href="{% if exercise.plan %}{% url 'coach:plan_detail' exercise.plan.id %}{% else %}{% url 'coach:plan_list' %}{% endif %}">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

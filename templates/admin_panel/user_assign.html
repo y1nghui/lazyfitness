@@ -1,3 +1,52 @@
 {% extends "shared/base.html" %}
 {% block title %}Assign User — LazyFitness{% endblock %}
-{% block content %}<div class="row g-4"><div class="col-lg-7"><div class="card p-4"><h2 class="section-title">Assign Coach / Advisor</h2><p><strong>Gym user:</strong> {{ gym_user.user_name }}</p><p class="text-secondary">Saving assignments creates/updates the shared conversation.</p><form method="post" novalidate>{% csrf_token %}<input type="hidden" name="next" value="{{ next_url }}">{% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}{% for field in form %}<div class="mb-3"><label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.help_text %}<div class="form-text text-secondary">{{ field.help_text }}</div>{% endif %}{% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}</div>{% endfor %}<button class="btn btn-primary">Save Assignment</button><a class="btn btn-outline-light" href="{{ next_url }}">Cancel</a></form></div></div><div class="col-lg-5"><div class="card p-4"><h4>Assignment History</h4>{% for item in history %}<div class="border-bottom border-secondary py-2"><div class="small text-secondary">{{ item.changed_at|date:"d M Y, h:i A" }} by {{ item.changed_by.username|default:"System" }}</div>Coach: {{ item.old_coach.coach_name|default:"None" }} → {{ item.new_coach.coach_name|default:"None" }}<br>Advisor: {{ item.old_health_advisor.advisor_name|default:"None" }} → {{ item.new_health_advisor.advisor_name|default:"None" }}{% if item.note %}<div class="small text-secondary">{{ item.note }}</div>{% endif %}</div>{% empty %}<p class="text-secondary">No assignment history yet.</p>{% endfor %}</div></div></div>{% endblock %}
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card p-4">
+            <h2 class="section-title">Assign Coach / Advisor</h2>
+            <p><strong>Gym user:</strong> {{ gym_user.user_name }}</p>
+            <p class="text-secondary">Saving assignments creates/updates the shared conversation.</p>
+            <form method="post" novalidate>
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ next_url }}">
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                {% endif %}
+                {% for field in form %}
+                    <div class="mb-3">
+                        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <div class="form-text text-secondary">{{ field.help_text }}</div>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+                <button class="btn btn-primary">Save Assignment</button>
+                <a class="btn btn-outline-light" href="{{ next_url }}">Cancel</a>
+            </form>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card p-4">
+            <h4>Assignment History</h4>
+            {% for item in history %}
+                <div class="border-bottom border-secondary py-2">
+                    <div class="small text-secondary">{{ item.changed_at|date:"d M Y, h:i A" }} by {{ item.changed_by.username|default:"System" }}</div>
+                    Coach: {{ item.old_coach.coach_name|default:"None" }} → {{ item.new_coach.coach_name|default:"None" }}
+                    <br>
+                    Advisor: {{ item.old_health_advisor.advisor_name|default:"None" }} → {{ item.new_health_advisor.advisor_name|default:"None" }}
+                    {% if item.note %}
+                        <div class="small text-secondary">{{ item.note }}</div>
+                    {% endif %}
+                </div>
+            {% empty %}
+                <p class="text-secondary">No assignment history yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

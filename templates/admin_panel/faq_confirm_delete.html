@@ -1,3 +1,15 @@
 {% extends "shared/base.html" %}
 {% block title %}Delete FAQ — LazyFitness{% endblock %}
-{% block content %}<div class="row justify-content-center"><div class="col-lg-6"><div class="card p-4"><h2 class="section-title">Delete FAQ</h2><p>Delete this question?</p><blockquote class="border-start border-danger ps-3">{{ faq.question }}</blockquote><form method="post">{% csrf_token %}<button class="btn btn-danger">Delete</button><a class="btn btn-outline-light" href="{% url 'admin_panel:faq_list' %}">Cancel</a></form></div></div></div>{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6"><div class="card p-4">
+        <h2 class="section-title">Delete FAQ</h2>
+        <p>Delete this question?</p>
+        <blockquote class="border-start border-danger ps-3">{{ faq.question }}</blockquote>
+        <form method="post">{% csrf_token %}<button class="btn btn-danger">Delete</button>
+            <a class="btn btn-outline-light" href="{% url 'admin_panel:faq_list' %}">Cancel</a>
+        </form>
+    </div>
+</div>
+</div>
+{% endblock %}
