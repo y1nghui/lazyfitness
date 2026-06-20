@@ -1,0 +1,77 @@
+{% extends "shared/base.html" %}
+{% block title %}{{ plan.plan_name }} — LazyFitness{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 btn-toolbar-mobile">
+  <div>
+    <h2 class="section-title mb-1">{{ plan.plan_name }}</h2>
+    <div class="text-secondary">{{ plan.get_difficulty_display }} · {{ plan.get_target_goal_display }} · {{ plan.duration_weeks }} weeks</div>
+  </div>
+  <div class="d-flex gap-2 flex-wrap">
+    <a class="btn btn-primary" href="{% url 'coach:plan_assign' plan.pk %}">Assign Plan</a>
+    <a class="btn btn-outline-warning" href="{% url 'coach:plan_edit' plan.pk %}">Edit</a>
+    <a class="btn btn-outline-light" href="{% url 'coach:plan_list' %}">All Plans</a>
+  </div>
+</div>
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card p-3 mb-4">
+      <h5>Description</h5>
+      <p class="text-secondary mb-0">{{ plan.description|default:"No description yet." }}</p>
+    </div>
+    <div class="card p-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <h5>Workouts</h5>
+        <a class="btn btn-sm btn-primary" href="{% url 'coach:workout_create' plan.pk %}">Add Workout</a>
+      </div>
+      {% for workout in plan.workouts.all %}
+        <div class="border-top border-secondary-subtle py-3">
+          <div class="d-flex justify-content-between">
+            <strong>{{ workout.workout_name }}</strong>
+            <span class="badge {% if workout.status %}bg-success{% else %}bg-secondary{% endif %}">
+              {% if workout.status %}Available{% else %}Hidden{% endif %}
+            </span>
+          </div>
+          {% if workout.notes %}<p class="small text-secondary">{{ workout.notes }}</p>{% endif %}
+          <div class="mt-2">
+            {% for exercise in workout.exercises.all %}
+              <div class="small">
+                {{ exercise.exercise_name }} — {{ exercise.sets }} sets × {{ exercise.exercise_reps }} reps,
+                {{ exercise.rest_seconds }}s rest
+                {% if exercise.video_url %}<a class="text-accent" href="{{ exercise.video_url }}">Video</a>{% endif %}
+              </div>
+            {% empty %}
+              <span class="text-secondary small">No exercises added yet.</span>
+            {% endfor %}
+          </div>
+          <div class="d-flex gap-2 mt-2">
+            <a class="btn btn-sm btn-outline-light" href="{% url 'coach:exercise_create' workout.pk %}">Add Exercise</a>
+            <a class="btn btn-sm btn-outline-warning" href="{% url 'coach:workout_edit' workout.pk %}">Edit Workout</a>
+          </div>
+        </div>
+      {% empty %}
+        <div class="empty-state mt-3">No workouts in this plan yet.</div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card p-3">
+      <h5>Assigned Users</h5>
+      {% for row in assignment_rows %}
+        {% url 'coach:message_thread' row.gym_user.pk as plan_chat_url %}
+        <div class="border-bottom border-secondary-subtle py-2">
+          <strong>{{ row.gym_user.user_name }}</strong>
+          <div class="small text-secondary">{{ row.assignment.get_status_display }} · {{ row.assignment.assigned_at|date:"d M Y" }}</div>
+          <button class="btn btn-sm btn-outline-light mt-2" type="button" data-lf-toggle="offcanvas" data-lf-target="#planMessage{{ row.assignment.pk }}">
+            Message
+            {% if row.unread_count %}<span class="badge bg-danger">{{ row.unread_count }}</span>{% endif %}
+          </button>
+        </div>
+        {% include 'shared/quick_chat_panel.html' with panel_prefix='planMessage' panel_id=row.assignment.pk title='Message Assigned User' description='Send a quick care-team message about this workout plan.' partner_label='Health Advisor' partner_name=row.gym_user.assigned_advisor.advisor_name recent_messages=row.recent_messages can_message=row.ready post_url=plan_chat_url full_chat_url=plan_chat_url unavailable_text='Messaging becomes available after this gym user also has a health advisor assigned.' %}
+      {% empty %}
+        <div class="empty-state">Not assigned yet.</div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

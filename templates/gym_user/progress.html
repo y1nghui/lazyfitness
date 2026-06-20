@@ -1,0 +1,139 @@
+{% extends "shared/base.html" %}
+{% block title %}Progress Analytics — LazyFitness{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 btn-toolbar-mobile">
+  <h2 class="section-title mb-0">Progress Analytics</h2>
+  <a class="btn btn-primary" href="{% url 'gym_user:log_activity' %}">Log Activity</a>
+</div>
+<div class="row g-3 mb-4">
+  <div class="col-md-3"><div class="card p-3 metric-card"><span class="text-secondary">Workouts</span><h3>{{ total_workouts }}</h3></div></div>
+  <div class="col-md-3"><div class="card p-3 metric-card"><span class="text-secondary">Duration</span><h3>{{ total_duration }} min</h3></div></div>
+  <div class="col-md-3"><div class="card p-3 metric-card"><span class="text-secondary">Reps</span><h3>{{ total_reps }}</h3></div></div>
+  <div class="col-md-3"><div class="card p-3 metric-card"><span class="text-secondary">Best Streak</span><h3>{{ best_streak }}</h3></div></div>
+</div>
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card p-3 mb-4"><h5>Workout duration trend</h5><canvas id="durationChart"></canvas></div>
+    <div class="card p-3"><h5>Body measurement trend</h5><canvas id="measurementChart"></canvas></div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card p-3 mb-4">
+      <h5>Add Body Measurement</h5>
+      <form method="post" action="{% url 'gym_user:measurement_create' %}" novalidate>
+        {% csrf_token %}
+        {% for field in measurement_form %}
+          <div class="mb-2">
+            <label class="form-label small" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+          </div>
+        {% endfor %}
+        <button class="btn btn-primary w-100">Save Measurement</button>
+      </form>
+    </div>
+    <div class="card p-3">
+      <h5>Latest Measurements</h5>
+      {% for measurement in measurements %}
+        <div class="border-bottom border-secondary-subtle py-2">
+          <strong>{{ measurement.recorded_at|date:"d M Y" }}</strong>
+          <div class="small text-secondary">Weight {{ measurement.weight }} kg · Waist {{ measurement.waist_in_cm }} cm</div>
+        </div>
+      {% empty %}
+        <div class="empty-state">No measurements recorded yet.</div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+<div class="card p-3 mt-4">
+  <h5>Recent Activity Logs</h5>
+  <div class="table-responsive">
+    <table class="table table-dark align-middle">
+      <thead><tr><th>Date</th><th>Plan</th><th>Workouts</th><th>Reps</th><th>Duration</th><th>Streak</th></tr></thead>
+      <tbody>
+        {% for log in logs %}
+          <tr><td>{{ log.logged_at|date:"d M Y" }}</td><td>{{ log.plan.plan_name|default:"No plan" }}</td><td>{{ log.workouts_completed }}</td><td>{{ log.reps_completed }}</td><td>{{ log.workout_duration }} min</td><td>{{ log.workout_streak }}</td></tr>
+        {% empty %}
+          <tr><td colspan="6"><div class="empty-state">No activity logs yet.</div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+  function drawLineChart(canvasId, labels, datasets) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas || !canvas.getContext) {
+      return;
+    }
+
+    const context = canvas.getContext('2d');
+    const width = canvas.clientWidth || 640;
+    const height = 260;
+    const padding = 34;
+    canvas.width = width;
+    canvas.height = height;
+
+    const values = datasets.flatMap((dataset) => dataset.values).filter((value) => Number.isFinite(value));
+    const max = Math.max(...values, 1);
+    const min = Math.min(...values, 0);
+    const range = Math.max(max - min, 1);
+
+    context.clearRect(0, 0, width, height);
+    context.strokeStyle = '#333333';
+    context.lineWidth = 1;
+    context.beginPath();
+    context.moveTo(padding, padding);
+    context.lineTo(padding, height - padding);
+    context.lineTo(width - padding, height - padding);
+    context.stroke();
+
+    datasets.forEach((dataset, datasetIndex) => {
+      const stroke = datasetIndex === 0 ? '#e03a20' : '#ffc107';
+      context.strokeStyle = stroke;
+      context.fillStyle = stroke;
+      context.lineWidth = 2;
+      context.beginPath();
+
+      dataset.values.forEach((value, index) => {
+        const x = padding + ((width - padding * 2) * index / Math.max(dataset.values.length - 1, 1));
+        const y = height - padding - ((value - min) / range * (height - padding * 2));
+        if (index === 0) {
+          context.moveTo(x, y);
+        } else {
+          context.lineTo(x, y);
+        }
+      });
+
+      context.stroke();
+
+      dataset.values.forEach((value, index) => {
+        const x = padding + ((width - padding * 2) * index / Math.max(dataset.values.length - 1, 1));
+        const y = height - padding - ((value - min) / range * (height - padding * 2));
+        context.beginPath();
+        context.arc(x, y, 3, 0, Math.PI * 2);
+        context.fill();
+      });
+
+      context.fillText(dataset.label, padding, 16 + datasetIndex * 16);
+    });
+
+    context.fillStyle = '#a4a4a4';
+    context.font = '12px Segoe UI, Arial, sans-serif';
+    labels.slice(-5).forEach((label, index, recentLabels) => {
+      const x = padding + ((width - padding * 2) * index / Math.max(recentLabels.length - 1, 1));
+      context.fillText(label, x - 18, height - 10);
+    });
+  }
+
+  drawLineChart('durationChart', {{ chart_labels|safe }}, [
+    { label: 'Minutes', values: {{ duration_data|safe }} }
+  ]);
+
+  drawLineChart('measurementChart', {{ measurement_labels|safe }}, [
+    { label: 'Weight (kg)', values: {{ weight_data|safe }} },
+    { label: 'Waist (cm)', values: {{ waist_data|safe }} }
+  ]);
+</script>
+{% endblock %}

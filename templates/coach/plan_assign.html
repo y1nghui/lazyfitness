@@ -1,0 +1,26 @@
+{% extends "shared/base.html" %}
+{% block title %}Assign Plan — LazyFitness{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card p-4">
+      <h2 class="section-title">Assign {{ plan.plan_name }}</h2>
+      <p class="text-secondary">Choose one or more of your assigned gym users.</p>
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+        <div class="mb-3">
+          <label class="form-label">{{ form.gym_users.label }}</label>
+          <div class="row g-2">
+            {% for checkbox in form.gym_users %}<div class="col-md-6"><div class="form-check">{{ checkbox.tag }} <label class="form-check-label">{{ checkbox.choice_label }}</label></div></div>{% endfor %}
+          </div>
+          {% for error in form.gym_users.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+        </div>
+        <div class="mb-3"><label class="form-label" for="{{ form.notes.id_for_label }}">{{ form.notes.label }}</label>{{ form.notes }}</div>
+        <button class="btn btn-primary">Assign Plan</button>
+        <a class="btn btn-outline-light" href="{% url 'coach:plan_detail' plan.pk %}">Cancel</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

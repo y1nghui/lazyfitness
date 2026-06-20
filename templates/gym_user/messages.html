@@ -1,0 +1,14 @@
+{% extends "shared/base.html" %}
+{% block title %}Messages — LazyFitness{% endblock %}
+{% block content %}
+<h2 class="section-title">Care Team Messages</h2>
+<div class="card p-4 text-center">
+  <h4 class="text-accent">Your care team has not been fully assigned yet</h4>
+  <p class="text-secondary mb-3">A shared conversation becomes available after an admin assigns both one fitness coach and one health advisor to your profile.</p>
+  <div class="row g-3 justify-content-center">
+    <div class="col-md-4"><div class="border border-secondary rounded p-3 h-100"><span class="badge bg-primary">Coach</span><br>{% if gym_user.assigned_coach %}<strong>{{ gym_user.assigned_coach.coach_name }}</strong>{% else %}<span class="text-secondary">Not assigned</span>{% endif %}</div></div>
+    <div class="col-md-4"><div class="border border-secondary rounded p-3 h-100"><span class="badge bg-success">Health Advisor</span><br>{% if gym_user.assigned_advisor %}<strong>{{ gym_user.assigned_advisor.advisor_name }}</strong>{% else %}<span class="text-secondary">Not assigned</span>{% endif %}</div></div>
+  </div>
+  <a class="btn btn-outline-light mt-4" href="{% url 'gym_user:dashboard' %}">Back to Dashboard</a>
+</div>
+{% endblock %}

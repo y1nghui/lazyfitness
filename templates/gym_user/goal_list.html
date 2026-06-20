@@ -1,0 +1,56 @@
+{% extends "shared/base.html" %}
+{% block title %}Fitness Goals — LazyFitness{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 btn-toolbar-mobile">
+  <h2 class="section-title mb-0">Fitness Goals</h2>
+  <a class="btn btn-primary" href="{% url 'gym_user:goal_create' %}">Add Goal</a>
+</div>
+<div class="row g-3 mb-4">
+  <div class="col-md"><div class="card p-3 metric-card"><span class="text-secondary">Not Started</span><h3>{{ summary.not_started }}</h3></div></div>
+  <div class="col-md"><div class="card p-3 metric-card"><span class="text-secondary">In Progress</span><h3>{{ summary.active }}</h3></div></div>
+  <div class="col-md"><div class="card p-3 metric-card"><span class="text-secondary">Overdue</span><h3>{{ summary.overdue }}</h3></div></div>
+  <div class="col-md"><div class="card p-3 metric-card"><span class="text-secondary">Completed</span><h3>{{ summary.completed }}</h3></div></div>
+  <div class="col-md"><div class="card p-3 metric-card"><span class="text-secondary">Cancelled</span><h3>{{ summary.cancelled }}</h3></div></div>
+</div>
+<div class="row g-3">
+  {% for goal in goals %}
+    <div class="col-lg-6">
+      <div class="card p-3 h-100">
+        <div class="d-flex justify-content-between align-items-start gap-2">
+          <div>
+            <h5>{{ goal.goal_name }}</h5>
+            <p class="text-secondary mb-2">{{ goal.goal_description }}</p>
+            {% if goal.target_date %}<small class="text-secondary">Target: {{ goal.target_date|date:"d M Y" }}</small>{% endif %}
+          </div>
+          <span class="badge {% if goal.effective_status == 'completed' %}bg-success{% elif goal.effective_status == 'cancelled' %}bg-secondary{% elif goal.effective_status == 'overdue' %}bg-danger{% else %}bg-warning text-dark{% endif %}">{{ goal.effective_status_label }}</span>
+        </div>
+        <div class="d-flex flex-wrap gap-2 mt-3">
+          <a class="btn btn-sm btn-outline-light" href="{% url 'gym_user:goal_edit' goal.pk %}">Edit</a>
+          {% if goal.status == 'completed' %}
+            <form method="post" action="{% url 'gym_user:goal_uncomplete' goal.pk %}">{% csrf_token %}<button class="btn btn-sm btn-outline-warning">Unmark completed</button></form>
+          {% else %}
+            <form method="post" action="{% url 'gym_user:goal_complete' goal.pk %}">{% csrf_token %}<button class="btn btn-sm btn-success">Mark completed</button></form>
+          {% endif %}
+          {% if goal.status != 'cancelled' %}
+            <button class="btn btn-sm btn-outline-danger" data-lf-toggle="modal" data-lf-target="#cancelGoal{{ goal.pk }}">Cancel goal</button>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="cancelGoal{{ goal.pk }}" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header"><h5 class="modal-title">Cancel goal?</h5><button type="button" class="btn-close btn-close-white" data-lf-dismiss="modal"></button></div>
+          <div class="modal-body">This will mark <strong>{{ goal.goal_name }}</strong> as Cancelled. You can edit the goal later if needed.</div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-light" data-lf-dismiss="modal">Keep goal</button>
+            <form method="post" action="{% url 'gym_user:goal_cancel' goal.pk %}">{% csrf_token %}<button class="btn btn-danger">Cancel goal</button></form>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <div class="col-12"><div class="empty-state">No fitness goals yet. Add your first goal to start tracking progress.</div></div>
+  {% endfor %}
+</div>
+{% endblock %}

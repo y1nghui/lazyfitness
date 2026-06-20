@@ -1,0 +1,40 @@
+{% extends "shared/base.html" %}
+{% block title %}My Account — LazyFitness{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2 class="section-title mb-0">My Account</h2>
+      <div class="d-flex gap-2">
+        <a class="btn btn-outline-warning" href="{% url 'accounts:password_change' %}">Change Password</a>
+        <a class="btn btn-outline-light" href="{% url 'accounts:redirect' %}">Back to dashboard</a>
+      </div>
+    </div>
+    <div class="card p-4 mb-4">
+      <div class="d-flex align-items-center gap-3">
+        {% if user.profile_picture %}<img src="{{ user.profile_picture.url }}" alt="{{ user.username }}" class="rounded-circle" style="width:88px;height:88px;object-fit:cover;border:2px solid var(--lf-accent);">{% else %}<div class="rounded-circle d-flex align-items-center justify-content-center" style="width:88px;height:88px;background:#2a2a2a;border:2px solid var(--lf-accent);font-size:2rem;font-weight:700;">{{ user.avatar_initial }}</div>{% endif %}
+        <div><h4 class="mb-1">{{ user.display_name }}</h4><div class="text-secondary">{{ user.get_role_display }} · @{{ user.username }}</div><div class="small text-secondary">Joined {{ user.date_joined|date:"d M Y" }}</div></div>
+      </div>
+    </div>
+    <div class="card p-4">
+      <h5 class="mb-3">Edit account details</h5>
+      <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+        {% for field in form %}
+          <div class="mb-3{% if field.field.widget.input_type == 'checkbox' %} form-check{% endif %}">
+            {% if field.field.widget.input_type == 'checkbox' %}
+              {{ field }} <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {% else %}
+              <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}
+            {% endif %}
+            {% if field.help_text %}<div class="form-text text-secondary">{{ field.help_text }}</div>{% endif %}
+            {% for error in field.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+          </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">Save account</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

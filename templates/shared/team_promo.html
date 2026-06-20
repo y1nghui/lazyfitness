@@ -1,0 +1,111 @@
+<section class="my-5" id="care-team">
+  <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3 mb-4">
+    <div>
+      <span class="badge badge-accent mb-2">Real guidance, simple tracking</span>
+      <h2 class="section-title mb-2">Meet Your LazyFitness Care Team</h2>
+      <p class="text-secondary mb-0">Get support from active fitness coaches and health advisors once an admin assigns your care team.</p>
+    </div>
+    {% if not user.is_authenticated %}
+      <div class="d-flex gap-2">
+        <a class="btn btn-primary" href="{% url 'accounts:register' %}">Register as Gym User</a>
+        <a class="btn btn-outline-light" href="{% url 'accounts:login' %}">Login</a>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="h5 mb-0 text-accent">Meet Our Coaches</h3>
+            <span class="badge text-bg-dark border border-secondary">Fitness Coach</span>
+          </div>
+          {% if public_coaches %}
+            <div class="row g-3">
+              {% for coach in public_coaches %}
+                <div class="col-md-6">
+                  <div class="card h-100 border-secondary">
+                    <div class="card-body text-center">
+                      {% if coach.user.profile_picture %}
+                        <img src="{{ coach.user.profile_picture.url }}" alt="{{ coach.coach_name }} profile picture" class="rounded-circle mb-3 team-avatar">
+                      {% else %}
+                        <div class="team-avatar-initial mx-auto mb-3">{{ coach.user.avatar_initial }}</div>
+                      {% endif %}
+                      <h4 class="h6 mb-1">{{ coach.coach_name }}</h4>
+                      <span class="badge badge-accent mb-2">Fitness Coach</span>
+                      {% if coach.specialty %}
+                        <p class="small text-secondary mb-1"><strong>Specialty:</strong> {{ coach.specialty }}</p>
+                      {% endif %}
+                      {% if coach.years_experience %}
+                        <p class="small text-secondary mb-1">{{ coach.years_experience }} year{{ coach.years_experience|pluralize }} experience</p>
+                      {% endif %}
+                      {% if coach.bio %}
+                        <p class="small text-secondary mb-2">{{ coach.bio|truncatechars:120 }}</p>
+                      {% else %}
+                        <p class="small text-secondary mb-2">Ready to help gym users stay consistent and improve safely.</p>
+                      {% endif %}
+                      <span class="badge text-bg-secondary">{{ coach.assigned_count|default:0 }} assigned user{{ coach.assigned_count|default:0|pluralize }}</span>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="text-center py-4 text-secondary">
+              <div class="display-6">🏋️</div>
+              <p class="mb-0">Our coaching team will be displayed here soon.</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="h5 mb-0 text-accent">Meet Our Health Advisors</h3>
+            <span class="badge text-bg-dark border border-secondary">Health Advisor</span>
+          </div>
+          {% if public_advisors %}
+            <div class="row g-3">
+              {% for advisor in public_advisors %}
+                <div class="col-md-6">
+                  <div class="card h-100 border-secondary">
+                    <div class="card-body text-center">
+                      {% if advisor.user.profile_picture %}
+                        <img src="{{ advisor.user.profile_picture.url }}" alt="{{ advisor.advisor_name }} profile picture" class="rounded-circle mb-3 team-avatar">
+                      {% else %}
+                        <div class="team-avatar-initial mx-auto mb-3">{{ advisor.user.avatar_initial }}</div>
+                      {% endif %}
+                      <h4 class="h6 mb-1">{{ advisor.advisor_name }}</h4>
+                      <span class="badge text-bg-success mb-2">Health Advisor</span>
+                      {% if advisor.specialty %}
+                        <p class="small text-secondary mb-1"><strong>Specialty:</strong> {{ advisor.specialty }}</p>
+                      {% endif %}
+                      {% if advisor.years_experience %}
+                        <p class="small text-secondary mb-1">{{ advisor.years_experience }} year{{ advisor.years_experience|pluralize }} experience</p>
+                      {% endif %}
+                      {% if advisor.bio %}
+                        <p class="small text-secondary mb-2">{{ advisor.bio|truncatechars:120 }}</p>
+                      {% else %}
+                        <p class="small text-secondary mb-2">Ready to review progress and send healthier diet recommendations.</p>
+                      {% endif %}
+                      <span class="badge text-bg-secondary">{{ advisor.assigned_count|default:0 }} assigned user{{ advisor.assigned_count|default:0|pluralize }}</span>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="text-center py-4 text-secondary">
+              <div class="display-6">🥗</div>
+              <p class="mb-0">Our health advisor team will be displayed here soon.</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

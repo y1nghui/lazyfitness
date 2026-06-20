@@ -1,0 +1,18 @@
+{% extends "shared/base.html" %}
+{% block title %}Workout Plans — LazyFitness{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 btn-toolbar-mobile">
+  <h2 class="section-title mb-0">Workout Plans</h2>
+  <a class="btn btn-primary" href="{% url 'coach:plan_create' %}">New Plan</a>
+</div>
+<div class="row g-3">
+  {% for plan in plans %}
+    <div class="col-lg-6"><div class="card p-3 h-100">
+      <div class="d-flex justify-content-between"><h5>{{ plan.plan_name }}</h5><span class="badge bg-info text-dark">{{ plan.assignments.count }} assigned</span></div>
+      <div class="text-secondary small">{{ plan.get_difficulty_display }} · {{ plan.get_target_goal_display }} · {{ plan.duration_weeks }} weeks</div>
+      <p class="mt-2 text-secondary">{{ plan.description|default:"No description." }}</p>
+      <div class="d-flex gap-2 flex-wrap"><a class="btn btn-sm btn-outline-light" href="{% url 'coach:plan_detail' plan.pk %}">View</a><a class="btn btn-sm btn-primary" href="{% url 'coach:plan_assign' plan.pk %}">Assign</a><a class="btn btn-sm btn-outline-warning" href="{% url 'coach:plan_edit' plan.pk %}">Edit</a></div>
+    </div></div>
+  {% empty %}<div class="col-12"><div class="empty-state">No plans yet. Create a plan, then assign it to gym users.</div></div>{% endfor %}
+</div>
+{% endblock %}

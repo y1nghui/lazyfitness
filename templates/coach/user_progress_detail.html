@@ -1,0 +1,116 @@
+{% extends "shared/base.html" %}
+{% block title %}{{ gym_user.user_name }} Progress — LazyFitness{% endblock %}
+
+{% block content %}
+{% url 'coach:message_thread' gym_user.pk as coach_detail_chat_url %}
+<div class="d-flex justify-content-between align-items-center mb-3 btn-toolbar-mobile">
+  <div>
+    <h2 class="section-title mb-0">{{ gym_user.user_name }} Progress</h2>
+    <p class="text-secondary mb-0">Selected-user progress detail for coach monitoring.</p>
+  </div>
+  <a class="btn btn-outline-light" href="{% url 'coach:monitor_progress' %}">Progress Overview</a>
+</div>
+
+{% include 'shared/quick_chat_panel.html' with panel_id='progressMessagePanel' title='Message Gym User' description='Send a quick care-team message while reviewing this user’s progress.' partner_label='Health Advisor' partner_name=gym_user.assigned_advisor.advisor_name recent_messages=recent_messages can_message=conversation post_url=coach_detail_chat_url full_chat_url=coach_detail_chat_url unavailable_text='Messaging becomes available after this gym user also has a health advisor assigned.' %}
+
+<div class="row g-3 mb-3">
+  <div class="col-md-3"><div class="card p-3"><div class="small text-secondary">Active goals</div><h3>{{ goal_summary.active }}</h3></div></div>
+  <div class="col-md-3"><div class="card p-3"><div class="small text-secondary">Completed goals</div><h3>{{ goal_summary.completed }}</h3></div></div>
+  <div class="col-md-3"><div class="card p-3"><div class="small text-secondary">BMI</div><h3>{{ gym_user.calculate_bmi|default:"—" }}</h3><span class="badge bg-secondary">{{ gym_user.bmi_category }}</span></div></div>
+  <div class="col-md-3"><div class="card p-3"><div class="small text-secondary">Assigned plans</div><h3>{{ assignments|length }}</h3></div></div>
+</div>
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card p-3 mb-3">
+      <h4>Recent Workout Activity</h4>
+      <div class="table-responsive">
+        <table class="table table-dark table-sm">
+          <thead><tr><th>Date</th><th>Plan</th><th>Workouts</th><th>Duration</th><th>Reps</th><th>Action</th></tr></thead>
+          <tbody>
+            {% for log in logs %}
+              <tr>
+                <td>{{ log.logged_at|date:"d M Y" }}</td>
+                <td>{{ log.plan.plan_name|default:"—" }}</td>
+                <td>{{ log.workouts_completed }}</td>
+                <td>{{ log.workout_duration }} min</td>
+                <td>{{ log.reps_completed }}</td>
+                <td><a class="btn btn-sm btn-outline-warning" href="{% url 'coach:feedback_create' log.pk %}?next={{ request.get_full_path|urlencode }}">Note</a></td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="6" class="text-secondary">No workout logs yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card p-3">
+      <h4>Progress Notes / Coach Feedback</h4>
+      {% for feedback in feedbacks %}
+        <div class="border-bottom border-secondary py-2">
+          <strong>{{ feedback.created_at|date:"d M Y" }} · Rating {{ feedback.rating }}/10</strong>
+          <p class="mb-0">{{ feedback.comment }}</p>
+        </div>
+      {% empty %}
+        <div class="empty-state">No coach feedback yet.</div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card p-3 mb-3">
+      <h4>Latest Body Measurements</h4>
+      {% if latest_measurement %}
+        <p>
+          Weight: {{ latest_measurement.weight }} kg<br>
+          Waist: {{ latest_measurement.waist_in_cm }} cm<br>
+          Neck: {{ latest_measurement.neck_in_cm }} cm<br>
+          Calories: {{ latest_measurement.calorie_intake }} kcal
+        </p>
+        <small class="text-secondary">{{ latest_measurement.recorded_at|date:"d M Y" }}</small>
+      {% else %}
+        <div class="empty-state">No measurements yet.</div>
+      {% endif %}
+    </div>
+    <div class="card p-3 mb-3">
+      <h4>Assigned Workout Plans</h4>
+      {% for assignment in assignments %}
+        <div class="border-bottom border-secondary py-2">
+          <strong>{{ assignment.plan.plan_name }}</strong><br>
+          <span class="badge bg-secondary">{{ assignment.get_status_display }}</span>
+          <div class="small text-secondary">{{ assignment.assigned_at|date:"d M Y" }}</div>
+        </div>
+      {% empty %}
+        <div class="empty-state">No assigned plans yet.</div>
+      {% endfor %}
+    </div>
+    <div class="card p-3">
+      <h4>Quick Actions</h4>
+      <button class="btn btn-primary w-100 mb-2" type="button" data-lf-toggle="offcanvas" data-lf-target="#progressMessagePanel">Message</button>
+      <button class="btn btn-outline-warning w-100 mb-2" data-lf-toggle="offcanvas" data-lf-target="#assignPlanPanel">Assign Workout Plan</button>
+      <a class="btn btn-outline-light w-100" href="{% url 'coach:assigned_users' %}">Assigned Users</a>
+    </div>
+  </div>
+</div>
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="assignPlanPanel">
+  <div class="offcanvas-header">
+    <h5>Assign plan to {{ gym_user.user_name }}</h5>
+    <button type="button" class="btn-close btn-close-white" data-lf-dismiss="offcanvas"></button>
+  </div>
+  <div class="offcanvas-body">
+    <p class="text-secondary">Choose a plan and optional notes. The gym user will receive a notification.</p>
+    <form method="post" action="{% url 'coach:assign_plan_to_user' gym_user.pk %}">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <div class="mb-3">
+        <label class="form-label">Plan</label>
+        <select class="form-select" name="plan" required>
+          {% for plan in plans %}<option value="{{ plan.pk }}">{{ plan.plan_name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="mb-3"><label class="form-label">Notes</label><textarea class="form-control" name="notes" rows="3"></textarea></div>
+      <button class="btn btn-primary">Assign</button>
+      <a class="btn btn-outline-light" href="{% url 'coach:plan_list' %}">Full Plans Page</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

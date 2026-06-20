@@ -1,0 +1,36 @@
+{% extends "shared/base.html" %}
+{% block title %}Recommendations — LazyFitness{% endblock %}
+{% block content %}
+<h2 class="section-title">Health Recommendations</h2>
+<div class="row g-3">
+  {% for rec in recommendations %}
+    <div class="col-lg-6">
+      <div class="card p-3 h-100">
+        <div class="d-flex justify-content-between gap-2">
+          <h5>{{ rec.subject }}</h5>
+          <span class="badge {% if rec.status == 'completed' %}bg-success{% elif rec.status == 'cancelled' %}bg-secondary{% elif rec.status == 'read' %}bg-info text-dark{% else %}bg-danger{% endif %}">{{ rec.get_status_display }}</span>
+        </div>
+        <div class="small text-secondary mb-2">From {{ rec.advisor.advisor_name }} · {{ rec.created_at|date:"d M Y, h:i A" }}</div>
+        <p>{{ rec.advice|linebreaksbr }}</p>
+        <div class="d-flex flex-wrap gap-2 mt-auto">
+          {% if rec.status == 'sent' %}
+            <form method="post" action="{% url 'gym_user:recommendation_mark_read' rec.pk %}">{% csrf_token %}<button class="btn btn-sm btn-primary">Mark as read</button></form>
+          {% elif rec.status == 'read' %}
+            <form method="post" action="{% url 'gym_user:recommendation_unmark_read' rec.pk %}">{% csrf_token %}<button class="btn btn-sm btn-outline-warning">Unmark as read</button></form>
+          {% endif %}
+          {% if rec.status == 'completed' %}
+            <form method="post" action="{% url 'gym_user:recommendation_unmark_completed' rec.pk %}">{% csrf_token %}<button class="btn btn-sm btn-outline-warning">Unmark completed</button></form>
+          {% else %}
+            <form method="post" action="{% url 'gym_user:recommendation_mark_completed' rec.pk %}">{% csrf_token %}<button class="btn btn-sm btn-success">Mark completed</button></form>
+          {% endif %}
+          {% if rec.status != 'cancelled' %}
+            <form method="post" action="{% url 'gym_user:recommendation_cancel' rec.pk %}">{% csrf_token %}<button class="btn btn-sm btn-outline-danger">Dismiss</button></form>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <div class="col-12"><div class="empty-state">No recommendations yet.</div></div>
+  {% endfor %}
+</div>
+{% endblock %}

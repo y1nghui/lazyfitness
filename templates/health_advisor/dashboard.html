@@ -1,0 +1,53 @@
+{% extends "shared/base.html" %}
+{% block title %}Advisor Dashboard — LazyFitness{% endblock %}
+
+{% block content %}
+<h2 class="section-title">Health Advisor Dashboard</h2>
+<div class="row g-3 mb-4">
+  <div class="col-md-4"><div class="card p-3"><span class="text-secondary">Assigned Users</span><h3>{{ assigned_count }}</h3></div></div>
+  <div class="col-md-4"><div class="card p-3"><span class="text-secondary">Recent Reports</span><h3>{{ recent_reports|length }}</h3></div></div>
+  <div class="col-md-4"><div class="card p-3"><span class="text-secondary">Recommendations</span><h3>{{ recent_recommendations|length }}</h3></div></div>
+</div>
+<div class="card p-3">
+  <h4>Assigned Users</h4>
+  <div class="table-responsive">
+    <table class="table table-dark">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>BMI</th>
+          <th>Latest Report</th>
+          <th>Latest Recommendation</th>
+          <th>Unread</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in user_rows %}
+          {% url 'health_advisor:message_thread' row.gym_user.pk as advisor_chat_url %}
+          <tr>
+            <td>{{ row.gym_user.user_name }}</td>
+            <td>{{ row.bmi|default:"—" }} <span class="badge bg-secondary">{{ row.bmi_category }}</span></td>
+            <td>{% if row.latest_report %}{{ row.latest_report.date|date:"d M Y" }}{% else %}<span class="text-secondary">None</span>{% endif %}</td>
+            <td>{% if row.latest_recommendation %}{{ row.latest_recommendation.subject }}{% else %}<span class="text-secondary">None</span>{% endif %}</td>
+            <td>{% if row.unread_count %}<span class="badge bg-danger">{{ row.unread_count }}</span>{% else %}0{% endif %}</td>
+            <td>
+              <div class="d-flex flex-wrap gap-2">
+                <a class="btn btn-sm btn-primary" href="{% url 'health_advisor:user_profile' row.gym_user.pk %}">Open</a>
+                <button class="btn btn-sm btn-outline-light" type="button" data-lf-toggle="offcanvas" data-lf-target="#advisorDashboardMessage{{ row.gym_user.pk }}">Message</button>
+              </div>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6" class="text-center text-secondary">No users assigned yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% for row in user_rows %}
+  {% url 'health_advisor:message_thread' row.gym_user.pk as advisor_chat_url %}
+  {% include 'shared/quick_chat_panel.html' with panel_prefix='advisorDashboardMessage' panel_id=row.gym_user.pk title='Message Gym User' description='Send a quick care-team message from your dashboard.' partner_label='Fitness Coach' partner_name=row.gym_user.assigned_coach.coach_name recent_messages=row.recent_messages can_message=row.ready post_url=advisor_chat_url full_chat_url=advisor_chat_url unavailable_text='Messaging becomes available after this gym user also has a coach assigned.' %}
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "shared/base.html" %}
+{% block title %}Profile — LazyFitness{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card p-4">
+      <h3 class="text-accent">{{ gym_user.user_name }}</h3>
+      <p class="text-secondary mb-1">{{ request.user.username }} · {{ request.user.email }}</p>
+      <span class="badge {% if gym_user.profile_completed %}bg-success{% else %}bg-warning text-dark{% endif %} mb-3">{% if gym_user.profile_completed %}Profile completed{% else %}Profile required{% endif %}</span>
+      <p class="mb-1">BMI: <strong>{% if bmi %}{{ bmi }}{% else %}—{% endif %}</strong></p>
+      <p class="mb-1">Height: {{ gym_user.height }} cm</p>
+      <p class="mb-0">Weight: {{ gym_user.weight }} kg</p>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card p-4">
+      <h2 class="section-title">{% if is_new_profile %}Create Your Gym Profile{% else %}Edit Profile{% endif %}</h2>
+      {% if is_new_profile %}<p class="text-secondary">Please customize your profile before using the dashboard. The current values are only safe defaults.</p>{% endif %}
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+        <div class="row">
+          {% for field in form %}
+            <div class="col-md-6 mb-3">
+              <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              {% if field.help_text %}<div class="form-text text-secondary">{{ field.help_text }}</div>{% endif %}
+              {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+          {% endfor %}
+        </div>
+        <button class="btn btn-primary" type="submit">Save Profile</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

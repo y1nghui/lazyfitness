@@ -1,0 +1,42 @@
+{% extends "shared/base.html" %}
+{% block title %}{{ mode }} {{ schedule_kind|default:"Schedule" }} — LazyFitness{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card p-4">
+      <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+        <div>
+          <h2 class="section-title mb-1">{{ mode }} {{ schedule_kind|default:"Schedule Item" }}</h2>
+          {% if schedule_help %}<p class="text-secondary mb-0">{{ schedule_help }}</p>{% endif %}
+        </div>
+        <a class="btn btn-outline-light btn-sm" href="{{ cancel_url|default:'/' }}">Back</a>
+      </div>
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+        {% endif %}
+        {% for field in form %}
+          <div class="mb-3">
+            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+            {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+          </div>
+        {% endfor %}
+        <div class="d-flex flex-wrap gap-2">
+          <button class="btn btn-primary" type="submit">Save</button>
+          <a class="btn btn-outline-light" href="{{ cancel_url|default:'/' }}">Cancel</a>
+          {% if schedule_item and schedule_kind == 'Monthly Plan' %}
+            <a class="btn btn-outline-danger" href="{% url 'gym_user:monthly_schedule_delete' schedule_item.pk %}">Delete</a>
+          {% elif schedule_item and schedule_kind == 'Weekly Routine' %}
+            <a class="btn btn-outline-danger" href="{% url 'gym_user:weekly_schedule_delete' schedule_item.pk %}">Delete</a>
+          {% endif %}
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

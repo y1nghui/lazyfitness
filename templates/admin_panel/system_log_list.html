@@ -1,0 +1,16 @@
+{% extends "shared/base.html" %}
+{% block title %}System Logs — LazyFitness{% endblock %}
+{% block content %}
+<h2 class="section-title">System Logs</h2>
+<div class="card p-3 mb-3">
+  <form method="get" class="row g-2 align-items-end">
+    <div class="col-md-3"><label class="form-label" for="q">Search description</label><input id="q" class="form-control" name="q" value="{{ search }}" placeholder="e.g. password reset"></div>
+    <div class="col-md-2"><label class="form-label" for="event">Event type</label><select id="event" class="form-select" name="event"><option value="">All events</option>{% for value,label in event_choices %}<option value="{{ value }}" {% if event_filter == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+    <div class="col-md-2"><label class="form-label" for="module">Module</label><input id="module" class="form-control" name="module" value="{{ module_filter }}" placeholder="User Management"></div>
+    <div class="col-md-2"><label class="form-label" for="start">Start date</label><input id="start" class="form-control" type="date" name="start" value="{{ start }}"></div>
+    <div class="col-md-2"><label class="form-label" for="end">End date</label><input id="end" class="form-control" type="date" name="end" value="{{ end }}"></div>
+    <div class="col-md-1"><button class="btn btn-primary w-100">Go</button></div>
+  </form>
+</div>
+<div class="card p-3"><div class="table-responsive"><table class="table table-dark table-hover"><thead><tr><th>Time</th><th>Event</th><th>Module</th><th>Description</th><th></th></tr></thead><tbody>{% for log in logs %}<tr><td>{{ log.timestamp|date:"d M Y, h:i A" }}</td><td>{{ log.get_event_display }}</td><td>{{ log.module|default:"—" }}</td><td>{{ log.description|truncatewords:12 }}</td><td><a class="btn btn-sm btn-outline-light" href="{% url 'admin_panel:system_log_detail' log.id %}">Open</a></td></tr>{% empty %}<tr><td colspan="5" class="text-center text-secondary">No logs found.</td></tr>{% endfor %}</tbody></table></div>{% include 'shared/pagination.html' %}</div>
+{% endblock %}

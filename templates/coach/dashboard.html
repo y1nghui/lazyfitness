@@ -1,0 +1,62 @@
+{% extends "shared/base.html" %}
+{% block title %}Coach Dashboard — LazyFitness{% endblock %}
+
+{% block content %}
+<h2 class="section-title">Coach Dashboard — {{ coach.coach_name }}</h2>
+<div class="row g-3 mb-4">
+  <div class="col-md-3"><div class="card p-3"><span class="text-secondary">Assigned Users</span><h3>{{ assigned_count }}</h3></div></div>
+  <div class="col-md-3"><div class="card p-3"><span class="text-secondary">Plans</span><h3>{{ plan_count }}</h3></div></div>
+  <div class="col-md-3"><div class="card p-3"><span class="text-secondary">Workouts</span><h3>{{ workout_count }}</h3></div></div>
+  <div class="col-md-3"><div class="card p-3"><span class="text-secondary">Exercises</span><h3>{{ exercise_count }}</h3></div></div>
+</div>
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card p-3 h-100">
+      <h4>Assigned Gym Users</h4>
+      {% for row in assigned_user_rows %}
+        {% url 'coach:message_thread' row.gym_user.pk as coach_chat_url %}
+        <div class="border-bottom border-secondary py-2">
+          <strong>{{ row.gym_user.user_name }}</strong>
+          <div class="small text-secondary">{{ row.gym_user.user.username }} · {{ row.gym_user.user.email }}</div>
+          <div class="d-flex flex-wrap gap-2 mt-2">
+            <button class="btn btn-sm btn-outline-light" type="button" data-lf-toggle="offcanvas" data-lf-target="#dashboardMessage{{ row.gym_user.pk }}">
+              Message
+              {% if row.unread_count %}<span class="badge bg-danger">{{ row.unread_count }}</span>{% endif %}
+            </button>
+            <a class="btn btn-sm btn-outline-warning" href="{% url 'coach:user_progress_detail' row.gym_user.pk %}">Progress</a>
+          </div>
+        </div>
+        {% include 'shared/quick_chat_panel.html' with panel_prefix='dashboardMessage' panel_id=row.gym_user.pk title='Message Gym User' description='Send a quick care-team message from your dashboard.' partner_label='Health Advisor' partner_name=row.gym_user.assigned_advisor.advisor_name recent_messages=row.recent_messages can_message=row.ready post_url=coach_chat_url full_chat_url=coach_chat_url unavailable_text='Messaging becomes available after this gym user also has a health advisor assigned.' %}
+      {% empty %}
+        <p class="text-secondary mb-0">No gym users assigned yet. Admin can assign users from User Management.</p>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card p-3 h-100">
+      <div class="d-flex justify-content-between"><h4>Your Plans</h4><a class="btn btn-sm btn-primary" href="{% url 'coach:plan_create' %}">New Plan</a></div>
+      {% for plan in plans %}
+        <div class="border-bottom border-secondary py-2">
+          <a class="text-accent" href="{% url 'coach:plan_detail' plan.id %}">{{ plan.plan_name }}</a>
+          <div class="text-secondary small">{{ plan.workouts.count }} workouts</div>
+        </div>
+      {% empty %}
+        <p class="text-secondary mb-0">No plans created yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card p-3 h-100">
+      <h4>Recent Assigned User Logs</h4>
+      {% for log in recent_logs %}
+        <div class="border-bottom border-secondary py-2">
+          {{ log.user.user_name }} · {{ log.logged_at }} · {{ log.workout_duration }} min
+          <a class="btn btn-sm btn-outline-light float-end" href="{% url 'coach:feedback_create' log.id %}">Feedback</a>
+        </div>
+      {% empty %}
+        <p class="text-secondary mb-0">No logs from your assigned users yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

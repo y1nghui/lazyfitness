@@ -1,0 +1,24 @@
+{% extends "shared/base.html" %}
+{% block title %}Delete {{ schedule_kind|default:"Schedule" }} — LazyFitness{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <div class="card p-4">
+      <h2 class="section-title">Delete {{ schedule_kind|default:"Schedule Item" }}</h2>
+      <p>
+        Delete <strong>{{ schedule_item.title }}</strong>
+        {% if item_summary %}on {{ item_summary }}{% endif %}?
+      </p>
+      <p class="text-secondary small mb-3">This action cannot be undone.</p>
+      <form method="post">
+        {% csrf_token %}
+        <div class="d-flex flex-wrap gap-2">
+          <button class="btn btn-danger" type="submit">Delete</button>
+          <a class="btn btn-outline-light" href="{{ cancel_url|default:'/' }}">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

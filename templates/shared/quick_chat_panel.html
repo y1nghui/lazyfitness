@@ -1,0 +1,88 @@
+<div class="offcanvas offcanvas-end" tabindex="-1" id="{{ panel_prefix|default:"" }}{{ panel_id }}">
+  <div class="offcanvas-header">
+    <h5>{{ title }}</h5>
+    <button
+      type="button"
+      class="btn-close btn-close-white"
+      data-lf-dismiss="offcanvas"
+      aria-label="Close"
+    ></button>
+  </div>
+  <div class="offcanvas-body">
+    {% if description %}
+      <p class="text-secondary">{{ description }}</p>
+    {% endif %}
+
+    {% if partner_label %}
+      <p class="small">
+        {{ partner_label }}:
+        {% if partner_name %}
+          <strong>{{ partner_name }}</strong>
+        {% else %}
+          <span class="text-secondary">Not assigned</span>
+        {% endif %}
+      </p>
+    {% endif %}
+
+    {% if recent_messages %}
+      <div class="mini-chat mb-3">
+        {% for msg in recent_messages reversed %}
+          <div class="chat-row {% if msg.sender_id == request.user.id %}chat-row-out{% else %}chat-row-in{% endif %}">
+            <div class="chat-bubble small {{ msg.sender.role_css_class }}">
+              <div class="chat-meta">
+                <span class="chat-sender-line">
+                  <strong>{{ msg.sender.display_name }}</strong>
+                  <span class="chat-role-badge {{ msg.sender.role_css_class }}">{{ msg.sender.role_label }}</span>
+                </span>
+                <span>{{ msg.created_at|date:"d M H:i" }}</span>
+              </div>
+              {% if msg.body %}
+                <div>{{ msg.body|truncatewords:20 }}</div>
+              {% endif %}
+              {% if msg.attachment %}
+                <div class="mt-1">
+                  <a href="{{ msg.attachment.url }}" target="_blank" rel="noopener">Attachment</a>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state mb-3">No recent messages.</div>
+    {% endif %}
+
+    {% if can_message %}
+      <form method="post" enctype="multipart/form-data" action="{{ post_url }}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <div class="mb-2">
+          <label class="form-label" for="body-{{ panel_prefix|default:"" }}{{ panel_id }}">Message</label>
+          <textarea
+            id="body-{{ panel_prefix|default:"" }}{{ panel_id }}"
+            class="form-control"
+            name="body"
+            rows="3"
+            placeholder="Write a message..."
+          ></textarea>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="attachment-{{ panel_prefix|default:"" }}{{ panel_id }}">Attachment</label>
+          <input id="attachment-{{ panel_prefix|default:"" }}{{ panel_id }}" class="form-control" type="file" name="attachment">
+          <div class="form-text">Allowed: JPG, PNG, WEBP, PDF, TXT, DOC, DOCX up to 5 MB.</div>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+          <button class="btn btn-primary" type="submit">Send</button>
+          <a class="btn btn-outline-light" href="{{ full_chat_url }}">Full Chat</a>
+        </div>
+      </form>
+    {% else %}
+      <div class="empty-state mb-3">
+        {{ unavailable_text|default:"Messaging becomes available after the full care team is assigned." }}
+      </div>
+      {% if full_chat_url %}
+        <a class="btn btn-outline-light" href="{{ full_chat_url }}">Open Message Page</a>
+      {% endif %}
+    {% endif %}
+  </div>
+</div>

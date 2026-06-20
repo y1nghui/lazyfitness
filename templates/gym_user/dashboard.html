@@ -1,0 +1,152 @@
+{% extends "shared/base.html" %}
+{% block title %}Gym Dashboard — LazyFitness{% endblock %}
+
+{% block content %}
+{% url 'gym_user:messages' as gym_message_url %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <h2 class="section-title mb-0">Welcome, {{ gym_user.user_name }}</h2>
+  <div class="d-flex flex-wrap gap-2">
+    <button class="btn btn-primary" type="button" data-lf-toggle="offcanvas" data-lf-target="#dashboardChatPanel">
+      Messages
+      {% if unread_messages %}<span class="badge bg-light text-dark">{{ unread_messages }}</span>{% endif %}
+    </button>
+    <a class="btn btn-outline-light" href="{{ gym_message_url }}">Full Chat</a>
+  </div>
+</div>
+
+{% include 'shared/quick_chat_panel.html' with panel_id='dashboardChatPanel' title='Message Care Team' description='Send a quick message to your assigned fitness coach and health advisor without leaving the dashboard.' partner_label='Care team' partner_name='Coach + Health Advisor' recent_messages=recent_messages can_message=can_message post_url=gym_message_url full_chat_url=gym_message_url unavailable_text='Messaging becomes available after an admin assigns both your fitness coach and health advisor.' %}
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card p-3 h-100">
+      <span class="text-secondary">BMI</span>
+      <h3>{{ bmi|default:"—" }}</h3>
+      <span class="badge bg-{{ bmi_badge_class }}">{{ bmi_category }}</span>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card p-3 h-100">
+      <span class="text-secondary">Coach</span>
+      <h5>{{ assigned_coach.coach_name|default:"Not assigned" }}</h5>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card p-3 h-100">
+      <span class="text-secondary">Health Advisor</span>
+      <h5>{{ assigned_advisor.advisor_name|default:"Not assigned" }}</h5>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card p-3 h-100">
+      <span class="text-secondary">Profile</span>
+      <h5>{% if gym_user.profile_completed %}Completed{% else %}Incomplete{% endif %}</h5>
+      <a href="{% url 'gym_user:profile' %}" class="text-accent small">Edit profile</a>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="card p-3 h-100">
+      <div class="d-flex justify-content-between align-items-center gap-2">
+        <h4>Active Goals</h4>
+        <a href="{% url 'gym_user:goal_create' %}" class="btn btn-sm btn-primary">New</a>
+      </div>
+      {% for goal in goals %}
+        <div class="border-bottom border-secondary py-2">
+          <span class="badge bg-success">{{ goal.effective_status_label }}</span>
+          <strong>{{ goal.goal_name }}</strong>
+          <div class="small text-secondary">Target: {{ goal.target_date|default:"No date" }}</div>
+        </div>
+      {% empty %}
+        <div class="empty-state">No active goals yet.</div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card p-3 h-100">
+      <div class="d-flex justify-content-between align-items-center gap-2">
+        <h4>Weekly Routine</h4>
+        <a href="{% url 'gym_user:weekly_schedule_create' %}" class="btn btn-sm btn-primary">New Routine</a>
+      </div>
+      {% for item in schedule %}
+        <div class="border-bottom border-secondary py-2">
+          <strong>Every {{ item.day }}</strong> {{ item.time|time:"H:i" }} · {{ item.title }}
+        </div>
+      {% empty %}
+        <div class="empty-state">No recurring weekly routine yet.</div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card p-3 h-100">
+      <h4>Recent Activity</h4>
+      {% for log in recent_logs %}
+        <div class="border-bottom border-secondary py-2">
+          {{ log.logged_at|date:"d M Y" }} · {{ log.workouts_completed }} workouts · {{ log.workout_duration }} minutes
+        </div>
+      {% empty %}
+        <div class="empty-state">No activity logs yet.</div>
+      {% endfor %}
+      <a class="btn btn-outline-light mt-2" href="{% url 'gym_user:log_activity' %}">Log Activity</a>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card p-3 h-100">
+      <div class="d-flex justify-content-between align-items-center gap-2">
+        <h4>Recommendations</h4>
+        <a class="btn btn-sm btn-outline-light" href="{% url 'gym_user:recommendation_list' %}">View all</a>
+      </div>
+      {% for rec in recommendations %}
+        <div class="border-bottom border-secondary py-2">
+          <span class="badge bg-info text-dark">{{ rec.get_status_display }}</span>
+          <strong>{{ rec.subject }}</strong>
+          <div class="small text-secondary">{{ rec.created_at|date:"d M Y, h:i A" }}</div>
+        </div>
+      {% empty %}
+        <div class="empty-state">No recommendations yet.</div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card p-3 h-100">
+      <div class="d-flex justify-content-between align-items-center gap-2">
+        <h4>Assigned Workout Plans</h4>
+        <a class="btn btn-sm btn-outline-light" href="{% url 'gym_user:workout_select' %}">View plans</a>
+      </div>
+      {% for assignment in assigned_workout_plans %}
+        <div class="border-bottom border-secondary py-2">
+          <span class="badge bg-primary">{{ assignment.get_status_display }}</span>
+          <strong>{{ assignment.plan.plan_name }}</strong>
+          <div class="small text-secondary">Coach: {{ assignment.assigned_by.coach_name }}</div>
+        </div>
+      {% empty %}
+        <div class="empty-state">No workout plans assigned yet.</div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card p-3 h-100">
+      <h4>Assigned Diet Plans</h4>
+      {% for plan in diet_plans %}
+        <div class="border-bottom border-secondary py-2">
+          <span class="badge bg-success">{{ plan.get_status_display }}</span>
+          <strong>{{ plan.title }}</strong>
+          <div class="small text-secondary">
+            {% if plan.daily_calorie_target %}{{ plan.daily_calorie_target }} kcal/day · {% endif %}
+            Advisor: {{ plan.advisor.advisor_name }}
+          </div>
+          {% if plan.meal_notes %}<div class="small mt-1">{{ plan.meal_notes|truncatewords:18 }}</div>{% endif %}
+        </div>
+      {% empty %}
+        <div class="empty-state">No diet plans assigned yet.</div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

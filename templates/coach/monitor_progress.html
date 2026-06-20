@@ -1,0 +1,46 @@
+{% extends "shared/base.html" %}
+{% block title %}Progress Monitoring — LazyFitness{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 btn-toolbar-mobile">
+  <h2 class="section-title mb-0">Fitness Trainer Progress Monitoring</h2>
+  <a class="btn btn-outline-light" href="{% url 'coach:assigned_users' %}">Assigned Users</a>
+</div>
+<div class="row g-3">
+  {% for row in rows %}
+    <div class="col-lg-6">
+      <div class="card p-3 h-100">
+        <div class="d-flex justify-content-between align-items-center">
+          <div><h5 class="mb-1"><a href="{% url 'coach:user_progress_detail' row.gym_user.pk %}" class="text-light text-decoration-none">{{ row.gym_user.user_name }}</a></h5><div class="small text-secondary">{{ row.total_workouts }} workouts · {{ row.total_duration }} minutes</div></div>
+          <span class="badge bg-secondary">{{ row.gym_user.bmi_category }}</span>
+        </div>
+        <div class="row g-2 my-3">
+          <div class="col"><div class="small text-secondary">Active goals</div><h5>{{ row.goal_summary.active }}</h5></div>
+          <div class="col"><div class="small text-secondary">Completed goals</div><h5>{{ row.goal_summary.completed }}</h5></div>
+          <div class="col"><div class="small text-secondary">Active plans</div><h5>{{ row.active_assignments|length }}</h5></div>
+        </div>
+        {% if row.latest_measurement %}<p class="small text-secondary mb-1">Latest measurement: {{ row.latest_measurement.weight }}kg · waist {{ row.latest_measurement.waist_in_cm }}cm · {{ row.latest_measurement.recorded_at|date:"d M Y" }}</p>{% endif %}
+        {% if row.latest_log %}<p class="small text-secondary mb-1">Latest workout: {{ row.latest_log.logged_at|date:"d M Y" }} · {{ row.latest_log.workout_duration }} minutes · {{ row.latest_log.reps_completed }} reps</p>{% endif %}
+        {% if row.latest_feedback %}<p class="small mb-2"><strong>Latest progress note:</strong> {{ row.latest_feedback.comment|truncatewords:18 }}</p>{% endif %}
+        <div class="table-responsive">
+          <table class="table table-dark table-sm"><thead><tr><th>Date</th><th>Plan</th><th>Duration</th></tr></thead><tbody>{% for log in row.recent_logs %}<tr><td>{{ log.logged_at|date:"d M" }}</td><td>{{ log.plan.plan_name|default:"—" }}</td><td>{{ log.workout_duration }} min</td></tr>{% empty %}<tr><td colspan="3" class="text-secondary">No recent workout activity.</td></tr>{% endfor %}</tbody></table>
+        </div>
+        <div class="d-flex flex-wrap gap-2 mt-2">
+          {% if row.latest_log %}<a class="btn btn-sm btn-outline-warning" href="{% url 'coach:feedback_create' row.latest_log.pk %}">Add Progress Note</a>{% endif %}
+          <a class="btn btn-sm btn-primary" href="{% url 'coach:message_thread' row.gym_user.pk %}">Message</a><a class="btn btn-sm btn-outline-light" href="{% url 'coach:user_progress_detail' row.gym_user.pk %}">View Details</a>
+          <button class="btn btn-sm btn-outline-light" data-lf-toggle="offcanvas" data-lf-target="#quickPlan{{ row.gym_user.pk }}">Assign Plan</button>
+        </div>
+      </div>
+    </div>
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="quickPlan{{ row.gym_user.pk }}">
+      <div class="offcanvas-header"><h5>Assign plan to {{ row.gym_user.user_name }}</h5><button type="button" class="btn-close btn-close-white" data-lf-dismiss="offcanvas"></button></div>
+      <div class="offcanvas-body">
+        <form method="post" action="{% url 'coach:assign_plan_to_user' row.gym_user.pk %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><div class="mb-3"><label class="form-label">Plan</label><select class="form-select" name="plan" required>{% for plan in plans %}<option value="{{ plan.pk }}">{{ plan.plan_name }}</option>{% endfor %}</select></div><div class="mb-3"><label class="form-label">Notes</label><textarea class="form-control" name="notes" rows="3"></textarea></div><button class="btn btn-primary">Assign</button></form>
+        <a class="btn btn-outline-light mt-2" href="{% url 'coach:plan_list' %}">Full Plan Page</a>
+      </div>
+    </div>
+  {% empty %}
+    <div class="col-12"><div class="empty-state">No assigned users yet.</div></div>
+  {% endfor %}
+</div>
+{% include 'shared/pagination.html' %}
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "shared/base.html" %}
+{% block title %}Log Activity — LazyFitness{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-8"><div class="card p-4">
+  <h2 class="section-title">Log Today's Activity</h2>
+  {% if selected_plan %}<div class="alert alert-info">Selected plan: <strong>{{ selected_plan.plan_name }}</strong></div>{% endif %}
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+    <div class="row">
+      {% for field in form %}<div class="col-md-6 mb-3"><label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.help_text %}<div class="form-text text-secondary">{{ field.help_text }}</div>{% endif %}{% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}</div>{% endfor %}
+    </div>
+    <button class="btn btn-primary" type="submit">Save Activity</button>
+    <a class="btn btn-outline-light" href="{% url 'gym_user:dashboard' %}">Cancel</a>
+  </form>
+</div></div></div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "shared/base.html" %}
+{% block title %}Delete User — LazyFitness{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <div class="card p-4">
+      <h2 class="section-title">Delete User</h2>
+      <p>Are you sure you want to delete <strong class="text-accent">{{ target.username }}</strong>?</p>
+      <p class="text-secondary">{{ target.email }} · {{ target.get_role_display }}</p>
+      <p class="text-secondary">This action cannot be undone. Admin accounts are protected from deletion.</p>
+      <form method="post">{% csrf_token %}
+        <button class="btn btn-danger">Yes, Delete</button>
+        <a class="btn btn-outline-light" href="{% url 'admin_panel:user_list' %}">Cancel</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

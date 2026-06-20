@@ -1,0 +1,52 @@
+{% extends "shared/base.html" %}
+{% block title %}Diet Plans — LazyFitness{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 btn-toolbar-mobile">
+  <h2 class="section-title mb-0">Diet Plans</h2>
+  <a class="btn btn-primary" href="{% url 'health_advisor:diet_plan_create' %}">Create Diet Plan</a>
+</div>
+<div class="card p-3 mb-3">
+  <form method="get" class="row g-2 align-items-end">
+    <div class="col-md-10">
+      <label class="form-label">Status</label>
+      <select name="status" class="form-select">
+        <option value="">All statuses</option>
+        {% for value,label in status_choices %}<option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2"><button class="btn btn-primary w-100">Filter</button></div>
+  </form>
+</div>
+<div class="row g-3">
+  {% for row in plan_rows %}
+    {% with plan=row.plan %}
+      {% url 'health_advisor:message_thread' plan.gym_user.pk as diet_chat_url %}
+      <div class="col-lg-6">
+        <div class="card p-3 h-100">
+          <div class="d-flex justify-content-between">
+            <h5>{{ plan.title }}</h5>
+            <span class="badge bg-info text-dark">{{ plan.get_status_display }}</span>
+          </div>
+          <div class="small text-secondary">
+            {{ plan.gym_user.user_name }} · {% if plan.start_date %}{{ plan.start_date|date:"d M Y" }}{% else %}No start date{% endif %}
+          </div>
+          <p class="mt-2 text-secondary">{{ plan.description|truncatewords:24|default:"No description." }}</p>
+          <div class="d-flex gap-2 flex-wrap">
+            <a class="btn btn-sm btn-outline-light" href="{% url 'health_advisor:diet_plan_detail' plan.pk %}">View</a>
+            <a class="btn btn-sm btn-outline-warning" href="{% url 'health_advisor:diet_plan_edit' plan.pk %}">Edit</a>
+            <button class="btn btn-sm btn-primary" type="button" data-lf-toggle="offcanvas" data-lf-target="#dietPlanMessage{{ plan.pk }}">
+              Message
+              {% if row.unread_count %}<span class="badge bg-danger">{{ row.unread_count }}</span>{% endif %}
+            </button>
+          </div>
+        </div>
+      </div>
+      {% include 'shared/quick_chat_panel.html' with panel_prefix='dietPlanMessage' panel_id=plan.pk title='Message About Diet Plan' description='Send a quick care-team message about this diet plan.' partner_label='Fitness Coach' partner_name=plan.gym_user.assigned_coach.coach_name recent_messages=row.recent_messages can_message=row.ready post_url=diet_chat_url full_chat_url=diet_chat_url unavailable_text='Messaging becomes available after this gym user also has a coach assigned.' %}
+    {% endwith %}
+  {% empty %}
+    <div class="col-12"><div class="empty-state">No diet plans yet. Create one from here or from an assigned user page.</div></div>
+  {% endfor %}
+</div>
+{% include 'shared/pagination.html' %}
+{% endblock %}

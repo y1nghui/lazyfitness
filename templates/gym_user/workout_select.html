@@ -1,0 +1,91 @@
+{% extends "shared/base.html" %}
+{% block title %}Assigned Workouts — LazyFitness{% endblock %}
+
+{% block content %}
+{% url 'gym_user:messages' as gym_message_url %}
+<div class="d-flex justify-content-between align-items-center mb-3 btn-toolbar-mobile">
+  <h2 class="section-title mb-0">Assigned Workout Plans</h2>
+  <div class="d-flex flex-wrap gap-2">
+    <button class="btn btn-outline-light" type="button" data-lf-toggle="offcanvas" data-lf-target="#workoutChatPanel">
+      Message Care Team
+    </button>
+    <a class="btn btn-primary" href="{% url 'gym_user:log_activity' %}">Log Activity</a>
+  </div>
+</div>
+
+{% include 'shared/quick_chat_panel.html' with panel_id='workoutChatPanel' title='Message About Workout Plan' description='Ask your care team a question about your assigned workout plan or progress.' partner_label='Care team' partner_name='Coach + Health Advisor' recent_messages=recent_messages can_message=can_message post_url=gym_message_url full_chat_url=gym_message_url unavailable_text='Messaging becomes available after both your coach and health advisor are assigned.' %}
+
+<div class="row g-3">
+  {% for assignment in assignments %}
+    <div class="col-lg-6">
+      <div class="card p-3 h-100">
+        <div class="d-flex justify-content-between gap-2">
+          <div>
+            <h5>{{ assignment.plan.plan_name }}</h5>
+            <div class="text-secondary small">
+              Coach: {{ assignment.assigned_by.coach_name }} ·
+              {{ assignment.plan.get_difficulty_display }} ·
+              {{ assignment.plan.get_target_goal_display }}
+            </div>
+          </div>
+          <span class="badge bg-info text-dark">{{ assignment.get_status_display }}</span>
+        </div>
+        <p class="text-secondary mt-2">{{ assignment.plan.description|default:"No description." }}</p>
+        {% if assignment.notes %}<p class="small"><strong>Coach notes:</strong> {{ assignment.notes }}</p>{% endif %}
+        <div class="accordion mt-2" id="plan{{ assignment.pk }}">
+          {% for workout in assignment.plan.workouts.all %}
+            <div class="accordion-item bg-dark text-light border-secondary">
+              <h2 class="accordion-header">
+                <button
+                  class="accordion-button collapsed bg-dark text-light"
+                  type="button"
+                  data-lf-toggle="collapse"
+                  data-lf-target="#workout{{ workout.pk }}"
+                >
+                  {{ workout.workout_name }}
+                </button>
+              </h2>
+              <div id="workout{{ workout.pk }}" class="accordion-collapse collapse" data-lf-parent="#plan{{ assignment.pk }}">
+                <div class="accordion-body">
+                  {% for exercise in workout.exercises.all %}
+                    <div>{{ exercise.exercise_name }} — {{ exercise.sets }} sets × {{ exercise.exercise_reps }} reps, {{ exercise.rest_seconds }}s rest</div>
+                  {% empty %}
+                    <span class="text-secondary">No exercises added yet.</span>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          {% empty %}
+            <div class="empty-state">No workouts have been added to this plan yet.</div>
+          {% endfor %}
+        </div>
+        <div class="d-flex gap-2 flex-wrap mt-3">
+          <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="assignment" value="{{ assignment.pk }}">
+            <button class="btn btn-primary btn-sm">Use for activity log</button>
+          </form>
+          {% if assignment.status == 'completed' %}
+            <form method="post" action="{% url 'gym_user:assigned_plan_uncomplete' assignment.pk %}">
+              {% csrf_token %}
+              <button class="btn btn-outline-warning btn-sm">Unmark completed</button>
+            </form>
+          {% else %}
+            <form method="post" action="{% url 'gym_user:assigned_plan_complete' assignment.pk %}">
+              {% csrf_token %}
+              <button class="btn btn-success btn-sm">Mark completed</button>
+            </form>
+          {% endif %}
+          <button class="btn btn-outline-light btn-sm" type="button" data-lf-toggle="offcanvas" data-lf-target="#workoutChatPanel">
+            Message
+          </button>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <div class="col-12">
+      <div class="empty-state">No workout plan has been assigned yet. Your fitness coach can assign one from their dashboard.</div>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

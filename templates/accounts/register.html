@@ -1,0 +1,27 @@
+{% extends "shared/base.html" %}
+{% block title %}Register — LazyFitness{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6">
+    <div class="card p-4 shadow-sm">
+      <h2 class="section-title">Create Account</h2>
+      <p class="text-secondary">Public registration is for gym users only. Coaches and health advisors are created by an admin.</p>
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+        {% for field in form %}
+          <div class="mb-3">
+            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}<div class="form-text text-secondary">{{ field.help_text }}</div>{% endif %}
+            {% for error in field.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+          </div>
+        {% endfor %}
+        <button class="btn btn-primary w-100" type="submit">Register</button>
+      </form>
+      <p class="mt-3 mb-0 text-center">Already registered? <a class="text-accent" href="{% url 'accounts:login' %}">Login with username</a>.</p>
+    </div>
+  </div>
+</div>
+{% include 'shared/team_promo.html' %}
+{% endblock %}

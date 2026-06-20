@@ -1,0 +1,19 @@
+{% extends "shared/base.html" %}
+{% block title %}Notifications — LazyFitness{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 btn-toolbar-mobile">
+  <div><h2 class="section-title mb-0">Notification Center</h2><p class="text-secondary mb-0">Opening this page marks notifications as read. Red dots remain until you open each item.</p></div>
+  <div class="d-flex gap-2"><a class="btn btn-outline-light" href="{% url 'accounts:notification_mark_all_read' %}">Mark all as read</a><a class="btn btn-primary" href="{% url 'accounts:notification_mark_all_opened' %}">Mark all as opened</a></div>
+</div>
+<div class="card p-3">
+  {% for notification in notifications %}
+    <div class="notification-row d-flex justify-content-between gap-3 border-bottom border-secondary-subtle py-3 {% if not notification.is_opened %}notification-new{% endif %}">
+      <div class="d-flex gap-2">
+        {% if not notification.is_opened %}<span class="notification-dot" title="Not opened yet"></span>{% endif %}
+        <div><h5 class="mb-1">{{ notification.title }}</h5><p class="mb-1 text-secondary">{{ notification.message|default:"No extra details." }}</p><small class="text-secondary">{{ notification.created_at|date:"d M Y, h:i A" }}</small></div>
+      </div>
+      <div class="text-end"><span class="badge bg-secondary mb-2">Read</span>{% if not notification.is_opened %}<span class="badge bg-danger mb-2">New</span>{% endif %}<a class="btn btn-sm btn-primary d-block" href="{% url 'accounts:notification_open' notification.pk %}">Open</a></div>
+    </div>
+  {% empty %}<div class="empty-state">No notifications yet.</div>{% endfor %}
+</div>
+{% endblock %}

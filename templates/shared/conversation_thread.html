@@ -1,0 +1,61 @@
+{% extends "shared/base.html" %}
+{% block title %}{{ page_title }} — LazyFitness{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h2 class="section-title mb-1">{{ heading }}</h2>
+    <p class="text-secondary mb-0">{{ subtitle }}</p>
+  </div>
+  {% if back_href %}
+    <a class="btn btn-outline-light" href="{{ back_href }}">Back</a>
+  {% elif back_url_name %}
+    <a class="btn btn-outline-light" href="{% url back_url_name %}">Back</a>
+  {% endif %}
+</div>
+
+<div class="chat-shell card p-3 mb-3">
+  <div class="chat-bubbles">
+    {% for item in messages_list %}
+      <div class="chat-row {% if item.sender_id == request.user.id %}chat-row-out{% else %}chat-row-in{% endif %}">
+        <div class="chat-bubble {{ item.sender.role_css_class }}">
+          <div class="chat-meta">
+            <span class="chat-sender-line">
+              <strong>{{ item.sender.display_name }}</strong>
+              <span class="chat-role-badge {{ item.sender.role_css_class }}">{{ item.sender.role_label }}</span>
+            </span>
+            <span>{{ item.created_at|date:"d M Y, h:i A" }}</span>
+          </div>
+          {% if item.body %}<p class="mb-2">{{ item.body|linebreaksbr }}</p>{% endif %}
+          {% if item.attachment %}
+            <a class="btn btn-sm btn-outline-light" href="{{ item.attachment.url }}" target="_blank" rel="noopener">Open attachment</a>
+          {% endif %}
+          {% if item.sender_id == request.user.id %}
+            <div class="chat-status small text-secondary">Sent{% if item.read_by.count > 1 %} · Read{% endif %}</div>
+          {% endif %}
+        </div>
+      </div>
+    {% empty %}
+      <div class="empty-state">No messages yet. Start the conversation below.</div>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="card p-3">
+  <form method="post" enctype="multipart/form-data" class="chat-form">
+    {% csrf_token %}
+    {% if request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
+    <div class="mb-2">
+      {{ form.body }}
+      {% for error in form.body.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+    </div>
+    <div class="d-flex flex-wrap gap-2 align-items-center">
+      <div class="flex-grow-1">
+        {{ form.attachment }}
+        {% for error in form.attachment.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+        <div class="form-text">Allowed: JPG, PNG, WEBP, PDF, TXT, DOC, DOCX up to 5 MB.</div>
+      </div>
+      <button class="btn btn-primary" type="submit">Send</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

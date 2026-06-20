@@ -1,0 +1,45 @@
+{% extends "shared/base.html" %}
+{% block title %}{{ error_title|default:"Error" }} — LazyFitness{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8 col-xl-7">
+    <div class="card shadow-sm border-danger">
+      <div class="card-body p-4 p-md-5">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="rounded-circle bg-danger text-white d-flex align-items-center justify-content-center" style="width:54px;height:54px;font-size:1.6rem;">!</div>
+          <div>
+            <p class="text-secondary mb-1">Error{% if status_code %} {{ status_code }}{% endif %}</p>
+            <h1 class="h3 mb-0 text-accent">{{ error_title|default:"Input Error" }}</h1>
+          </div>
+        </div>
+
+        <div class="alert alert-danger mb-4">
+          {{ error_message|default:"Please correct the errors and try again." }}
+        </div>
+
+        {% if error_items %}
+          <h2 class="h5 mb-3">What needs fixing</h2>
+          <div class="list-group mb-4">
+            {% for item in error_items %}
+              <div class="list-group-item bg-dark text-light border-secondary">
+                <strong>{{ item.label }}:</strong> {{ item.message }}
+              </div>
+            {% endfor %}
+          </div>
+        {% elif form and form.errors %}
+          <div class="alert alert-danger">Please review the form errors and try again.</div>
+        {% endif %}
+
+        <div class="d-flex flex-wrap gap-2">
+          {% if back_url %}
+            <a class="btn btn-primary" href="{{ back_url }}">{{ back_label|default:"Back" }}</a>
+          {% else %}
+            <button class="btn btn-primary" type="button" onclick="history.back()">{{ back_label|default:"Back" }}</button>
+          {% endif %}
+          <a class="btn btn-outline-light" href="{% url 'landing' %}">Home</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
