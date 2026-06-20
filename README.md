@@ -33,9 +33,13 @@ Install and run:
 
 ```bash
 pip install -r requirements.txt
-python manage.py makemigrations
+python manage.py makemigrations accounts gym_user coach health_advisor admin_panel
 python manage.py migrate
 python manage.py runserver
+
+To create superuser (this is for your login into the database by http://1270.0.1:8000/django-admin):
+python manage.py createsuperuser
+
 ```
 
 Open: <http://127.0.0.1:8000/>
