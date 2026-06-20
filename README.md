@@ -38,7 +38,7 @@ python manage.py migrate
 python manage.py runserver
 
 To create superuser
-(this is for your login into the database by http://127.0.1:8000/django-admin):
+(this is for your login into the database by http://127.0.0.1:8000/django-admin):
 python manage.py createsuperuser
 
 ```
