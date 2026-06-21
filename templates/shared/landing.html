@@ -8,9 +8,6 @@
     <div class="d-flex gap-2 mt-4">
       {% if user.is_authenticated %}
         <a class="btn btn-primary btn-lg" href="{% url 'accounts:redirect' %}">Go to Dashboard</a>
-      {% else %}
-        <a class="btn btn-primary btn-lg" href="{% url 'accounts:register' %}">Register as Gym User</a>
-        <a class="btn btn-outline-light btn-lg" href="{% url 'accounts:login' %}">Login</a>
       {% endif %}
     </div>
   </div>
