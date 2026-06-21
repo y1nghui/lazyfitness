@@ -23,6 +23,7 @@ urlpatterns = [
     path('faq/<int:faq_id>/delete/', views.faq_delete, name='faq_delete'),
     path('feedback/', views.feedback_list, name='feedback_list'),
     path('feedback/<int:feedback_id>/', views.feedback_detail, name='feedback_detail'),
+    path('feedback/<int:feedback_id>/to-faq/', views.feedback_to_faq, name='feedback_to_faq'),
     path('export/users/', views.export_users, name='export_users'),
     path('export/login-activity/', views.export_login_activity, name='export_login_activity'),
     path('export/feedback/', views.export_feedback, name='export_feedback'),

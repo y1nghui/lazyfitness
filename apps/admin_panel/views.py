@@ -378,7 +378,7 @@ def faq_delete(request, faq_id):
 @admin_required
 def feedback_list(request):
     status = request.GET.get('status', '')
-    feedbacks = Feedback.objects.select_related('submitter', 'admin')
+    feedbacks = Feedback.objects.select_related('submitter')
     if status:
         feedbacks = feedbacks.filter(status=status)
     page_obj, page_query = paginate(request, feedbacks, per_page=20)
@@ -387,12 +387,18 @@ def feedback_list(request):
 
 @admin_required
 def feedback_detail(request, feedback_id):
-    feedback = get_object_or_404(Feedback.objects.select_related('submitter', 'admin'), pk=feedback_id)
+    feedback = get_object_or_404(Feedback.objects.select_related('submitter'), pk=feedback_id)
+    
+    # Auto-mark as viewed on first view
+    if feedback.status == 'unsolved' and not feedback.viewed_at:
+        feedback.status = 'viewed'
+        feedback.viewed_at = timezone.now()
+        feedback.save(update_fields=['status', 'viewed_at'])
+    
     if request.method == 'POST':
         form = FeedbackStatusForm(request.POST, instance=feedback)
         if form.is_valid():
             feedback = form.save(commit=False)
-            feedback.admin = _admin_profile(request.user)
             feedback.save()
             SystemLog.record('feedback_updated', f"Feedback #{feedback.id} marked {feedback.status}", user=request.user, module='Feedback')
             messages.success(request, f'Feedback marked as {feedback.get_status_display()}.')
@@ -400,6 +406,7 @@ def feedback_detail(request, feedback_id):
         messages.error(request, 'Please correct the highlighted feedback errors.')
     else:
         form = FeedbackStatusForm(instance=feedback)
+    
     return render(request, 'admin_panel/feedback_detail.html', {'feedback': feedback, 'form': form})
 
 
@@ -443,3 +450,30 @@ def export_feedback(request):
     SystemLog.record('export', 'Feedback CSV exported', user=request.user, module='CSV Export')
     return response
 
+
+@admin_required
+def feedback_to_faq(request, feedback_id):
+    feedback = get_object_or_404(Feedback, pk=feedback_id)
+    
+    # Pre-fill FAQ form with feedback data
+    initial_data = {
+        'question': feedback.title,
+        'answer': feedback.comment,
+    }
+    
+    if request.method == 'POST':
+        form = FAQForm(request.POST)
+        if form.is_valid():
+            faq = form.save(commit=False)
+            faq.admin = _admin_profile(request.user)
+            faq.save()
+            feedback.status = 'solved'
+            feedback.save(update_fields=['status'])
+            SystemLog.record('feedback_updated', f"Feedback #{feedback.id} converted to FAQ", user=request.user, module='Feedback')
+            messages.success(request, 'Feedback posted to FAQ successfully.')
+            return redirect('admin_panel:faq_list')
+        messages.error(request, 'Please correct the highlighted errors.')
+    else:
+        form = FAQForm(initial=initial_data)
+    
+    return render(request, 'admin_panel/faq_form.html', {'form': form, 'feedback': feedback, 'is_from_feedback': True})

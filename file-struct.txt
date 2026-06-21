@@ -1,0 +1,195 @@
+lazyfitness/
+├── .git/
+├── .venv/
+├── apps/
+│   ├── __init__.py
+│   ├── __pycache__/
+│   ├── accounts/
+│   │   ├── __init__.py
+│   │   ├── __pycache__/
+│   │   ├── admin.py
+│   │   ├── apps.py
+│   │   ├── decorators.py
+│   │   ├── forms.py
+│   │   ├── models.py
+│   │   ├── signals.py
+│   │   ├── urls.py
+│   │   ├── utils.py
+│   │   ├── views.py
+│   │   └── migrations/
+│   │       ├── __init__.py
+│   │       ├── __pycache__/
+│   │       ├── 0001_initial.py
+│   │       ├── 0002_user_username.py
+│   │       └── 0003_user_profile_picture.py
+│   ├── admin_panel/
+│   │   ├── __init__.py
+│   │   ├── __pycache__/
+│   │   ├── admin.py
+│   │   ├── forms.py
+│   │   ├── models.py
+│   │   ├── tests.py
+│   │   ├── urls.py
+│   │   ├── views.py
+│   │   ├── management/
+│   │   │   ├── __init__.py
+│   │   │   ├── __pycache__/
+│   │   │   └── commands/
+│   │   │       ├── __init__.py
+│   │   │       └── seed_demo.py
+│   │   └── migrations/
+│   │       ├── __init__.py
+│   │       ├── __pycache__/
+│   │       ├── 0001_initial.py
+│   │       ├── 0002_loginactivity_assignment_log.py
+│   │       └── 0003_assignmenthistory_systemlog_events.py
+│   ├── coach/
+│   │   ├── __init__.py
+│   │   ├── __pycache__/
+│   │   ├── admin.py
+│   │   ├── forms.py
+│   │   ├── models.py
+│   │   ├── urls.py
+│   │   ├── views.py
+│   │   └── migrations/
+│   │       ├── __init__.py
+│   │       ├── __pycache__/
+│   │       ├── 0001_initial.py
+│   │       ├── 0002_initial.py
+│   │       ├── 0003_coach_bio_coach_specialty_coach_years_experience.py
+│   │       └── 0004_alter_workoutplan_options_exercise_rest_seconds_and_more.py
+│   ├── gym_user/
+│   │   ├── __init__.py
+│   │   ├── __pycache__/
+│   │   ├── admin.py
+│   │   ├── forms.py
+│   │   ├── messaging.py
+│   │   ├── models.py
+│   │   ├── urls.py
+│   │   ├── views.py
+│   │   └── migrations/
+│   │       ├── __init__.py
+│   │       ├── __pycache__/
+│   │       ├── 0001_initial.py
+│   │       ├── 0002_assignments_profile_completed.py
+│   │       ├── 0003_alter_activitylog_plan.py
+│   │       ├── 0004_conversation_message.py
+│   │       ├── 0005_goal_schedule_message_reads.py
+│   │       ├── 0006_conversation_created_by_conversation_is_group_and_more.py
+│   │       ├── 0007_notification_is_opened.py
+│   │       └── 0008_monthlyworkoutschedule.py
+│   └── health_advisor/
+│       ├── __init__.py
+│       ├── __pycache__/
+│       ├── admin.py
+│       ├── forms.py
+│       ├── models.py
+│       ├── urls.py
+│       ├── views.py
+│       └── migrations/
+│           ├── __init__.py
+│           ├── __pycache__/
+│           ├── 0001_initial.py
+│           ├── 0002_healthadvisor_bio_healthadvisor_specialty_and_more.py
+│           ├── 0003_recommendation_status_choices.py
+│           ├── 0004_alter_recommendation_options.py
+│           └── 0005_recommendation_updated_at_and_more.py
+├── lazyfitness/ (project config)
+│   ├── __init__.py
+│   ├── __pycache__/
+│   ├── asgi.py
+│   ├── context_processors.py
+│   ├── public_team.py
+│   ├── settings.py
+│   ├── urls.py
+│   ├── views.py
+│   ├── view_helpers.py
+│   ├── wsgi.py
+│   └── .venv/
+├── media/
+│   └── profile_pictures/
+├── static/
+│   ├── .gitkeep
+│   ├── css/
+│   │   └── lazyfitness.css
+│   └── js/
+│       └── lazyfitness-ui.js
+├── templates/
+│   ├── accounts/
+│   │   ├── account_edit.html
+│   │   ├── forgot_password.html
+│   │   ├── login.html
+│   │   ├── notifications.html
+│   │   ├── password_change.html
+│   │   └── register.html
+│   ├── admin_panel/
+│   │   ├── dashboard.html
+│   │   ├── faq_confirm_delete.html
+│   │   ├── faq_form.html
+│   │   ├── faq_list.html
+│   │   ├── feedback_detail.html
+│   │   ├── feedback_list.html
+│   │   ├── login_activity_list.html
+│   │   ├── system_log_detail.html
+│   │   ├── system_log_list.html
+│   │   ├── user_add.html
+│   │   ├── user_assign.html
+│   │   ├── user_confirm_delete.html
+│   │   ├── user_detail.html
+│   │   ├── user_edit.html
+│   │   ├── user_list.html
+│   │   └── user_reset_password.html
+│   ├── coach/
+│   │   ├── assigned_users.html
+│   │   ├── dashboard.html
+│   │   ├── exercise_confirm_delete.html
+│   │   ├── exercise_form.html
+│   │   ├── feedback_form.html
+│   │   ├── messages.html
+│   │   ├── monitor_progress.html
+│   │   ├── plan_assign.html
+│   │   ├── plan_confirm_delete.html
+│   │   ├── plan_detail.html
+│   │   ├── plan_form.html
+│   │   ├── plan_list.html
+│   │   ├── user_progress_detail.html
+│   │   ├── workout_confirm_delete.html
+│   │   └── workout_form.html
+│   ├── gym_user/
+│   │   ├── dashboard.html
+│   │   ├── goal_form.html
+│   │   ├── goal_list.html
+│   │   ├── log_activity.html
+│   │   ├── messages.html
+│   │   ├── profile.html
+│   │   ├── progress.html
+│   │   ├── recommendation_list.html
+│   │   ├── schedule.html
+│   │   ├── schedule_confirm_delete.html
+│   │   ├── schedule_form.html
+│   │   └── workout_select.html
+│   ├── health_advisor/
+│   │   ├── assigned_users.html
+│   │   ├── dashboard.html
+│   │   ├── diet_plan_detail.html
+│   │   ├── diet_plan_form.html
+│   │   ├── diet_plan_list.html
+│   │   ├── messages.html
+│   │   ├── recommendation_form.html
+│   │   ├── recommendation_list.html
+│   │   └── user_profile.html
+│   └── shared/
+│       ├── base.html
+│       ├── conversation_thread.html
+│       ├── error.html
+│       ├── landing.html
+│       ├── pagination.html
+│       ├── quick_chat_panel.html
+│       └── team_promo.html
+├── db.sqlite3
+├── manage.py
+├── README.md
+├── INTEGRATION_GUIDE.md
+└── requirements.txt
+    └── Django==4.2.13
+    └── Pillow
