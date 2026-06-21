@@ -87,15 +87,30 @@ class FAQ(models.Model):
 
 
 class Feedback(models.Model):
-    STATUS_CHOICES = [('pending', 'Pending'), ('reviewed', 'Reviewed'), ('resolved', 'Resolved')]
-    submitter = models.ForeignKey(User, on_delete=models.CASCADE, related_name='submitted_feedbacks')
-    admin = models.ForeignKey(AdminProfile, on_delete=models.SET_NULL, null=True, blank=True, related_name='managed_feedbacks')
+    TYPE_CHOICES = [
+        ('bug_report', 'Report Bug'),
+        ('feature_request', 'Feature Request'),
+        ('user_report', 'Report User'),
+        ('account_issue', 'Account Issue'),
+        ('system_performance', 'System Performance'),
+        ('general_inquiry', 'General Inquiry'),
+        ('other', 'Other'),
+    ]
+    
+    STATUS_CHOICES = [
+        ('unsolved', 'Unsolved'),
+        ('viewed', 'Viewed'),
+        ('solved', 'Solved'),
+    ]
+    
+    submitter = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=255)
     comment = models.TextField()
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    feedback_type = models.CharField(max_length=30, choices=TYPE_CHOICES, default='general_inquiry')
+    attachment = models.FileField(upload_to='feedback_attachments/', blank=True, null=True)
+    status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='unsolved')
+    viewed_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    class Meta:
-        ordering = ['-created_at']
-
     def __str__(self):
-        return f"Feedback #{self.id} by {self.submitter.username} [{self.status}]"
+        return f"[{self.get_feedback_type_display()}] {self.title} by {self.submitter.email}"

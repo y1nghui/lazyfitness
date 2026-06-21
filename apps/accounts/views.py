@@ -7,6 +7,8 @@ from .forms import AccountEditForm, RegistrationForm, LoginForm, StyledPasswordC
 from .models import User
 from .signals import ensure_role_profile
 from lazyfitness.public_team import get_public_care_team
+from apps.admin_panel.models import Feedback
+from apps.gym_user.models import Notification
 
 
 def _client_ip(request):
@@ -156,6 +158,35 @@ def notification_unmark_read(request, notification_id):
     notification.is_read = False
     notification.save(update_fields=['is_read'])
     return redirect('accounts:notifications')
+
+@login_required
+def submit_feedback(request):
+    from apps.admin_panel.forms import FeedbackSubmissionForm
+    
+    if request.method == 'POST':
+        form = FeedbackSubmissionForm(request.POST, request.FILES)
+        if form.is_valid():
+            feedback = form.save(commit=False)
+            feedback.submitter = request.user
+            feedback.save()
+
+            admins = User.objects.filter(role='admin', is_active=True)
+            for admin in admins:
+                Notification.objects.create(
+                    recipient=admin,
+                    title=f'New {feedback.get_feedback_type_display()} from {request.user.username}',
+                    message=f"{feedback.title}",
+                    url = reverse('admin_panel:feedback_detail', args=[feedback.id])
+                )
+
+            messages.success(request, 'Your feedback has been submitted successfully.')
+            return redirect('landing')
+        else:
+            messages.error(request, 'Please correct the highlighted errors.')
+    else:
+        form = FeedbackSubmissionForm()
+
+    return render(request, 'shared/submit_feedback.html', {'form': form})
 
 
 @login_required

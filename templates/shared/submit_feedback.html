@@ -1,0 +1,45 @@
+{% extends "shared/base.html" %}
+
+{% block title %}Submit Feedback | LazyFitness{% endblock %}
+
+{% block content %}
+<div class="card p-4 shadow-sm">
+  <h2 class="section-title">Submit Feedback</h2>
+  <p class="text-secondary mb-4">
+    Tell us what you think or report an issue. Your feedback helps us improve LazyFitness.
+  </p>
+  <form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+    {% endif %}
+    
+    <div class="mb-3">
+      <label class="form-label" for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+      {{ form.title }}
+      {% for error in form.title.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+    </div>
+    
+    <div class="mb-3">
+      <label class="form-label" for="{{ form.feedback_type.id_for_label }}">{{ form.feedback_type.label }}</label>
+      {{ form.feedback_type }}
+      {% for error in form.feedback_type.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+    </div>
+    
+    <div class="mb-3">
+      <label class="form-label" for="{{ form.comment.id_for_label }}">{{ form.comment.label }}</label>
+      {{ form.comment }}
+      {% for error in form.comment.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+    </div>
+    
+    <div class="mb-3">
+      <label class="form-label" for="{{ form.attachment.id_for_label }}">{{ form.attachment.label }}</label>
+      {{ form.attachment }}
+      {% if form.attachment.help_text %}<div class="form-text">{{ form.attachment.help_text }}</div>{% endif %}
+      {% for error in form.attachment.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Submit Feedback</button>
+  </form>
+</div>
+{% endblock %}

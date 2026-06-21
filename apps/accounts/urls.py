@@ -12,6 +12,7 @@ urlpatterns = [
     path('account/', views.account_edit, name='account_edit'),
     path('password/change/', views.password_change, name='password_change'),
     path('password/forgot/', views.forgot_password, name='forgot_password'),
+    path('feedback/submit/', views.submit_feedback, name='submit_feedback'),
     path('notifications/', views.notifications, name='notifications'),
     path('notifications/all/read/', views.notification_mark_all_read, name='notification_mark_all_read'),
     path('notifications/all/opened/', views.notification_mark_all_opened, name='notification_mark_all_opened'),

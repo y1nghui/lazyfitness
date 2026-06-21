@@ -85,7 +85,7 @@ h6,
 }
 
 .display-4 {
-  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  font-size: clamp(2.2rem, 3vw, 3.1rem);
   font-weight: 800;
 }
 
@@ -1319,4 +1319,91 @@ canvas {
 
 .calendar-weekday-headings {
   padding-inline: .35rem;
+}
+
+@media (min-width: 992px) {
+  .profile-hover-dropdown {
+    position: relative; 
+  }
+  
+  .profile-hover-dropdown:hover .dropdown-menu {
+    display: block;
+  }
+
+  /* Prevents the menu from disappearing in the gap */
+  .profile-hover-dropdown::after {
+    content: "";
+    position: absolute;
+    bottom: -15px;
+    left: 0;
+    right: 0;
+    height: 15px;
+  }
+
+  /* Shifts the menu to align the middle points */
+  .profile-centered-menu {
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%);
+  }
+}
+
+/* Edge-to-Edge Hover Boxes */
+.profile-hover-dropdown .dropdown-menu {
+  padding: 0.5rem 0; 
+  overflow: hidden;  
+  min-width: max-content !important;
+}
+
+.profile-hover-dropdown .dropdown-item {
+  border-radius: 0; 
+  padding: 0.65rem 1.25rem; 
+  width: 100%;
+  justify-content: center; 
+  text-align: center;
+}
+
+/* Normal item hover */
+.profile-hover-dropdown .dropdown-item:hover {
+  background: #383838; 
+  color: #ffffff !important;
+}
+
+/* Logout item hover */
+.profile-hover-dropdown .logout-item:hover {
+  background: var(--lf-danger) !important;
+  color: #ffffff !important;
+}
+
+@media (min-width: 992px) {
+  .navbar-collapse {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    width: 100%;
+  }
+}
+
+.nav-icon-link {
+  padding: 0.55rem !important; /* Makes the hover effect a nice square box */
+  border-radius: 10px;
+}
+
+.icon-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* The absolute positioned Red Dot for alerts */
+.nav-icon-dot {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 10px;
+  height: 10px;
+  background-color: var(--lf-danger);
+  border: 2px solid #1e1e1e; /* Matches navbar background to make it 'cut out' of the icon */
+  border-radius: 50%;
 }

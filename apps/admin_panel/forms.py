@@ -210,3 +210,20 @@ class FeedbackStatusForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         apply_plain_ui(self)
+
+class FeedbackSubmissionForm(forms.ModelForm):
+    class Meta:
+        model = Feedback
+        fields = ['title', 'feedback_type', 'comment', 'attachment']
+        widgets = {
+            'comment': forms.Textarea(attrs={'rows': 6}),
+            'attachment': forms.FileInput(),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        apply_plain_ui(self)
+        self.fields['title'].label = 'Feedback Title'
+        self.fields['feedback_type'].label = 'Feedback Type'
+        self.fields['comment'].label = 'Description'
+        self.fields['attachment'].help_text = 'Optional: JPG, PNG, PDF, TXT (max 5MB)'
