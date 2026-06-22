@@ -26,7 +26,7 @@
                 <button class="btn btn-primary w-100">Save Status</button>
                 {% if feedback.status != 'solved' %}
                     <div class="mb-3">
-                        <a href="{% url 'admin_panel:feedback_to_faq' feedback.id %}" class="btn btn-success">Post to FAQ</a>
+                        <a href="{% url 'admin_panel:feedback_to_faq' feedback.id %}" class="btn btn-success w-100 mt-2">Post to FAQ</a>
                     </div>
                 {% endif %}
             </form>

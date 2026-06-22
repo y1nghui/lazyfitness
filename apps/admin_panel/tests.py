@@ -6,7 +6,7 @@ from django.urls import NoReverseMatch, reverse
 from django.utils import timezone
 from apps.accounts.models import User
 from apps.accounts.signals import ensure_role_profile
-from apps.admin_panel.models import AssignmentHistory, LoginActivity
+from apps.admin_panel.models import AssignmentHistory, Feedback, LoginActivity
 from apps.coach.models import AssignedWorkoutPlan, Coach, WorkoutPlan
 from apps.health_advisor.models import DietPlan, HealthAdvisor, Recommendation
 from apps.gym_user.models import Conversation, FitnessGoal, GymUser, Message, MonthlyWorkoutSchedule, Notification, WorkoutSchedule
@@ -363,6 +363,18 @@ class FeatureImprovementTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'feature_other_gym')
         self.assertNotContains(response, 'feature_gym@example.test')
+
+    def test_legacy_admin_feedback_redirects_to_admin_panel(self):
+        self.client.login(username=self.admin.username, password=PASSWORD)
+        feedback = Feedback.objects.create(
+            submitter=self.admin,
+            title='Legacy redirect test',
+            comment='Check route alias',
+        )
+
+        response = self.client.get(f'/admin/feedback/{feedback.pk}/', follow=True)
+        self.assertRedirects(response, f'/admin-panel/feedback/{feedback.pk}/', status_code=302, target_status_code=200)
+        self.assertContains(response, 'Feedback #{}'.format(feedback.pk))
 
     def test_message_access_control_attachment_validation_and_group_chat_removed(self):
         get_or_create_conversation(self.gym_profile)
