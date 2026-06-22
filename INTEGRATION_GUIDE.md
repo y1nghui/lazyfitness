@@ -10,8 +10,11 @@ lazyfitness/
 ├── manage.py
 ├── requirements.txt
 ├── lazyfitness/          ← project config (shared)
+│   ├── __init__.py
+│   ├── asgi.py
 │   ├── settings.py
-│   └── urls.py
+│   ├── urls.py
+│   └── wsgi.py
 ├── apps/
 │   ├── accounts/         ← SHARED — login/register/roles (all members use this)
 │   ├── gym_user/         ← Wong Kai Jun
@@ -19,7 +22,8 @@ lazyfitness/
 │   ├── health_advisor/   ← Ng Ying Hui
 │   └── admin_panel/      ← Liew Wen Xing
 ├── templates/
-│   ├── shared/base.html  ← SHARED base template (extends for every page)
+│   ├── shared/
+│   │   └── base.html     ← SHARED base template (extends for every page)
 │   ├── accounts/
 │   ├── gym_user/
 │   ├── coach/
