@@ -51,10 +51,10 @@
             <li class="nav-item"><a class="nav-link" href="{% url 'health_advisor:recommendation_list' %}">Recommendations</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'accounts:submit_feedback' %}">Feedback</a></li>
           {% elif user.is_admin_user %}
-            <li class="nav-item"><a class="nav-link" href="{% url 'admin_panel:user_list' %}">Users</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'admin_panel:user_list' %}">Users Management</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'admin_panel:login_activity_list' %}">Login Activity</a></li>
-            <li class="nav-item"><a class="nav-link" href="{% url 'admin_panel:faq_list' %}">FAQ</a></li>
-            <li class="nav-item"><a class="nav-link" href="{% url 'admin_panel:feedback_list' %}">Feedback</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'admin_panel:faq_list' %}">FAQ Management</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'admin_panel:feedback_list' %}">Feedback Management</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'admin_panel:system_log_list' %}">Logs</a></li>
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" data-lf-toggle="dropdown" role="button" aria-expanded="false">Exports</a>
