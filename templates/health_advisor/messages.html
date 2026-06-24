@@ -19,7 +19,27 @@
         <div class="mt-3 small">
           <div>Coach: 
             {% if row.gym_user.assigned_coach %}
-            <span class="text-light">{{ row.gym_user.assigned_coach.coach_name }}</span>{% else %}<span class="text-secondary">Not assigned</span>{% endif %}</div><div>Messages: {% if row.conversation %}{{ row.conversation.messages.count }}{% else %}0{% endif %}</div></div><div class="mt-auto pt-3">{% if row.ready %}<a class="btn btn-primary btn-sm w-100" href="{% url 'health_advisor:message_thread' row.gym_user.pk %}">Open Care-Team Chat</a>{% else %}<span class="badge bg-secondary w-100 py-2">Waiting for full care team</span>{% endif %}</div></div></div>
+            <span class="text-light">{{ row.gym_user.assigned_coach.coach_name }}</span>
+            {% else %}
+            <span class="text-secondary">Not assigned</span>
+            {% endif %}
+          </div>
+            <div>Messages: {% if row.conversation %}
+              {{ row.conversation.messages.count }}
+              {% else %}
+              0
+              {% endif %}
+            </div>
+          </div>
+          <div class="mt-auto pt-3">
+            {% if row.ready %}
+            <a class="btn btn-primary btn-sm w-100" href="{% url 'health_advisor:message_thread' row.gym_user.pk %}">Open Care-Team Chat</a>
+            {% else %}
+            <span class="badge bg-secondary w-100 py-2">Waiting for full care team</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
   {% empty %}
   <div class="col-12">
     <div class="empty-state">No assigned gym users yet.</div>
