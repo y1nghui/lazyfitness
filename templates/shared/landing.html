@@ -27,29 +27,31 @@
 {% include 'shared/team_promo.html' %}
 
 <section class="py-5" id="faq">
-  <div class="row">
-    <div class="col-12 d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between mb-4 gap-3">
-      <h2 class="section-title mb-0">Frequently Asked Questions</h2>
-      <a class="btn btn-outline-light btn-sm ms-auto" href="{% url 'faq_public' %}">View all FAQs</a>
-    </div>
-  </div>
-  <div class="accordion" id="landingFaqAccordion">
-    {% for faq in faqs %}
-    <div class="accordion-item bg-dark text-light border-secondary">
-      <h2 class="accordion-header">
-        <button class="accordion-button collapsed bg-dark text-light" type="button" data-lf-toggle="collapse" data-lf-target="#landingFaq{{ faq.id }}">
-          {{ faq.question }}
-        </button>
-      </h2>
-      <div id="landingFaq{{ faq.id }}" class="accordion-collapse collapse" data-lf-parent="#landingFaqAccordion">
-        <div class="accordion-body">
-          <p>{{ faq.answer|linebreaksbr }}</p>
-        </div>
+  <div class="mx-auto" style="max-width: 800px;">
+    <div class="row mb-4">
+      <div class="col-12 d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3">
+        <h2 class="section-title mb-0">Frequently Asked Questions</h2>
       </div>
     </div>
-    {% empty %}
-    <div class="card p-4 text-center text-secondary">No FAQ entries yet.</div>
-    {% endfor %}
+    
+    <div class="accordion" id="landingFaqAccordion">
+      {% for faq in faqs %}
+      <div class="accordion-item lf-faq-item mb-3">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-lf-toggle="collapse" data-lf-target="#landingFaq{{ faq.id }}">
+            {{ faq.question }}
+          </button>
+        </h2>
+        <div id="landingFaq{{ faq.id }}" class="accordion-collapse collapse" data-lf-parent="#landingFaqAccordion">
+          <div class="accordion-body">
+            <p class="mb-0">{{ faq.answer|linebreaksbr }}</p>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="card p-4 text-center text-secondary bg-transparent border-secondary">No FAQ entries yet.</div>
+      {% endfor %}
+    </div>
   </div>
 </section>
 {% endblock %}

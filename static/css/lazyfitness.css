@@ -1397,6 +1397,48 @@ canvas {
   padding-inline: .35rem;
 }
 
+.lf-faq-item {
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 1px solid var(--lf-border) !important;
+  border-radius: 0 !important;
+  margin-bottom: 0 !important; 
+}
+
+.lf-faq-item:last-child {
+  border-bottom: none !important;
+}
+
+.lf-faq-item .accordion-button {
+  background: transparent !important; 
+  color: var(--lf-text) !important;
+  font-size: 1.15rem;
+  font-weight: 500;
+  box-shadow: none !important;
+  padding: 1.25rem 0; 
+  cursor: pointer; 
+  transition: color 0.2s ease;
+}
+
+.lf-faq-item .accordion-button:hover,
+.lf-faq-item .accordion-button:not(.collapsed) {
+  color: var(--lf-accent) !important;
+}
+
+.lf-faq-item .accordion-button::after {
+  filter: brightness(0) invert(1) !important; 
+  transition: transform 0.2s ease-in-out;
+}
+
+.lf-faq-item .accordion-body {
+  padding: 0 0 1.5rem 0; /* Flush alignment */
+  color: var(--lf-muted);
+  font-size: 1rem;
+  line-height: 1.6;
+  background: transparent !important;
+  border: none !important;
+}
+
 @media (min-width: 992px) {
   .profile-hover-dropdown {
     position: relative; 

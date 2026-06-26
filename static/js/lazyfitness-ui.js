@@ -135,24 +135,22 @@
   });
 
   document.querySelectorAll('[data-lf-back]').forEach((button) => {
-    button.addEventListener('click', () => {
+    button.addEventListener('click', (event) => {
+      event.preventDefault(); // Prevents default button behavior
+      
       const fallback = button.dataset.fallback || '/';
       const nextUrl = new URLSearchParams(window.location.search).get('next');
+      
       if (nextUrl && nextUrl.startsWith('/') && !nextUrl.startsWith('//')) {
         window.location.href = nextUrl;
         return;
       }
-      if (document.referrer) {
-        try {
-          const referrer = new URL(document.referrer);
-          if (referrer.origin === window.location.origin) {
-            window.location.href = referrer.pathname + referrer.search;
-            return;
-          }
-        } catch (error) {
-          // Fall through to role fallback below.
-        }
+
+      if (window.history.length > 1 && document.referrer.includes(window.location.origin)) {
+        window.history.back();
+        return;
       }
+
       window.location.href = fallback;
     });
   });
