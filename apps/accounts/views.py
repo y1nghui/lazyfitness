@@ -180,7 +180,7 @@ def submit_feedback(request):
                 )
 
             messages.success(request, 'Your feedback has been submitted successfully.')
-            return redirect('landing')
+            return redirect('accounts:redirect')
         else:
             messages.error(request, 'Please correct the highlighted errors.')
     else:
