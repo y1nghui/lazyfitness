@@ -236,19 +236,36 @@ def user_assign(request, user_id):
 @admin_required
 def user_delete(request, user_id):
     target = get_object_or_404(User, pk=user_id)
+    
     if target.pk == request.user.pk:
         messages.error(request, 'You cannot delete your own account.')
         return redirect('admin_panel:user_detail', user_id=target.id)
+        
     if target.role == 'admin':
         messages.error(request, 'Cannot delete an admin account.')
         return redirect('admin_panel:user_list')
+        
     if request.method == 'POST':
+        # --- DEPENDENCY CHECK LOGIC ---
+        if target.role == 'fitness_coach':
+            active_trainees = GymUser.objects.filter(assigned_coach__user=target).count()
+            if active_trainees > 0:
+                messages.error(request, f"Deletion blocked. This coach has {active_trainees} active trainees assigned. Please reassign them first.")
+                return redirect('admin_panel:user_detail', user_id=target.id)
+                
+        elif target.role == 'health_advisor':
+            active_trainees = GymUser.objects.filter(assigned_advisor__user=target).count()
+            if active_trainees > 0:
+                messages.error(request, f"Deletion blocked. This advisor has {active_trainees} active trainees assigned. Please reassign them first.")
+                return redirect('admin_panel:user_detail', user_id=target.id)
+        # ------------------------------
+
         SystemLog.record('user_deleted', f"User {target.username} deleted", user=request.user, module='User Management')
         target.delete()
         messages.success(request, 'User deleted.')
         return redirect('admin_panel:user_list')
+        
     return render(request, 'admin_panel/user_confirm_delete.html', {'target': target})
-
 
 @admin_required
 @require_POST
