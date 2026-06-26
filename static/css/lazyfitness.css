@@ -128,6 +128,10 @@ h6,
   white-space: nowrap;
 }
 
+.navbar-toggler-wrapper {
+  display: none;
+}
+
 .navbar-toggler {
   display: none;
   margin-left: auto;
@@ -181,30 +185,37 @@ h6,
   display: inline-flex;
   align-items: center;
   gap: .4rem;
-  padding: .55rem .75rem;
+  padding: .55rem .85rem;
   border-radius: 10px;
   color: var(--lf-text);
   text-decoration: none;
-  transition: background .18s ease, color .18s ease, transform .18s ease;
+  font-weight: 600;
+  opacity: .88;
+  transition: background .18s ease, color .18s ease, opacity .18s ease, transform .18s ease;
+  box-sizing: border-box;
 }
 
 .nav-link:hover,
 .dropdown-item:hover,
 .text-accent {
   color: var(--lf-accent) !important;
+  opacity: 1;
+  background: rgba(224, 58, 32, .08);
 }
 
-.nav-link:hover,
-.dropdown-item:hover {
-  background: rgba(224, 58, 32, .12);
+#nav .main-nav .nav-link.dropdown-toggle {
+  padding-left: .75rem;
+  padding-right: .75rem;
 }
+
 
 .dropdown-menu {
   position: absolute;
   top: calc(100% + .45rem);
   right: 0;
   display: none;
-  min-width: 210px;
+  min-width: max-content;
+  width: auto;
   margin: 0;
   padding: .5rem;
   list-style: none;
@@ -1097,11 +1108,6 @@ textarea:focus {
   padding: .85rem 1rem;
 }
 
-.lf-footer {
-  border-top: 1px solid var(--lf-border);
-  color: var(--lf-muted);
-}
-
 @keyframes lf-toast-in {
   from {
     opacity: 0;
@@ -1130,26 +1136,43 @@ textarea:focus {
 
 @media (max-width: 991.98px) {
   .nav-container {
-    flex-wrap: wrap;
+    display: flex;
+    flex-wrap: wrap !important; 
+    align-items: center;
+  }
+  
+  .navbar-brand {
+    flex: 0 0 70%;
+    max-width: 70%;
+    margin: 0;
+    display: flex;
+    align-items: center;
   }
 
   .navbar-toggler {
     display: inline-flex;
+    margin-left: auto; 
+    margin-right: 0.5rem; 
   }
 
   .navbar-collapse {
     display: none;
-    flex: 0 0 100%;
+    flex: 0 0 100% !important; 
+    width: 100% !important;
+    margin-top: 1rem;
+    order: 3; 
   }
 
   .navbar-collapse.show {
-    display: block;
+    display: block !important;
   }
 
   .navbar-nav {
-    display: grid;
+    display: flex;
+    flex-direction: column; 
     align-items: stretch;
-    padding: .5rem 0 1rem;
+    padding: 0 0 1rem 0;
+    gap: 0.5rem;
   }
 
   .nav-link,
@@ -1157,13 +1180,66 @@ textarea:focus {
   .navbar .btn {
     width: 100%;
     justify-content: flex-start;
+    padding: 0.75rem 1rem; 
+  }
+
+  #nav .nav-actions {
+    position: relative !important; /* Acts as the anchor for the dropdowns */
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 1.5rem !important;
+    width: 100%;
+    padding: 1rem 0.5rem !important;
+    margin-top: 0.5rem;
+    border-top: 1px solid var(--lf-border);
+  }
+
+  #nav .nav-actions .nav-link {
+    width: auto !important;
+    padding: 0.5rem !important;
+  }
+
+  #nav .nav-actions .nav-item {
+    position: static !important;
+  }
+
+  #nav .nav-actions .dropdown-menu {
+    position: absolute !important;
+    top: 100% !important; /* Renders exactly underneath the icons */
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    margin-top: 0.5rem !important;
+    background: #1a1a1a !important; /* Solid dark background */
+    border: 1px solid var(--lf-border) !important;
+    border-radius: var(--lf-radius) !important;
+    padding: 0.5rem !important;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.6) !important;
+    z-index: 1050;
+  }
+
+  .profile-hover-dropdown .dropdown-item {
+    justify-content: flex-start !important;
+    text-align: left !important;
+    padding-left: 1rem !important;
+    border-left: none !important; 
+  }
+
+  .profile-hover-dropdown > .nav-link {
+    background: transparent !important;
   }
 
   .dropdown-menu {
     position: static;
     width: 100%;
-    margin-top: .35rem;
+    margin-top: 0.35rem;
     box-shadow: none;
+    background: transparent;
+    border: none;
+    border-left: 2px solid var(--lf-accent);
+    border-radius: 0;
+    padding-left: 0.5rem;
   }
 }
 
@@ -1352,7 +1428,8 @@ canvas {
 .profile-hover-dropdown .dropdown-menu {
   padding: 0.5rem 0; 
   overflow: hidden;  
-  min-width: max-content !important;
+  min-width: 14rem !important;
+  width: auto !important;
 }
 
 .profile-hover-dropdown .dropdown-item {
@@ -1408,6 +1485,104 @@ canvas {
   border-radius: 50%;
 }
 
+.site-footer {
+  background: rgba(18, 18, 18, .98);
+  border-top: 1px solid var(--lf-border);
+  padding-top: 1.8rem;
+  color: var(--lf-text);
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.footer-col {
+  min-width: 2rem;
+}
+
+.footer-brand {
+  max-width: 400px;
+}
+
+.footer-logo {
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: -.04em;
+  color: var(--lf-accent);
+}
+
+.footer-logo span {
+  color: #ffffff;
+}
+
+.footer-heading {
+  margin-bottom: .9rem;
+  font-size: 1rem;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.lf-footer-disclaimer,
+.lf-footer-disclaimer strong {
+  font-family: inherit;
+  color:#d0d0d0;
+}
+
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-links li {
+  display: block;
+  margin-bottom: .55rem;
+}
+
+.footer-links li a,
+a.footer-link {
+  display: block;
+  color: var(--lf-muted);
+  text-decoration: none !important;
+  font-family: inherit;
+  font-weight: 300;
+  transition: color .18s ease;
+}
+
+.footer-links li a:hover,
+.footer-links li a:focus,
+a.footer-link:hover,
+a.footer-link:focus {
+  color: var(--lf-accent);
+}
+
+.footer-copy {
+  color: var(--lf-muted);
+  line-height: 1.75;
+}
+
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: .55rem;
+}
+
+@media (max-width: 767.98px) {
+  .footer-bottom {
+    display: block;
+    text-align: center;
+  }
+}
+
+@media (min-width: 768px) {
+  .footer-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
 /* Navbar one-line desktop alignment fix */
 .nav-container {
   flex-wrap: nowrap;
@@ -1448,8 +1623,6 @@ canvas {
   }
 
   #nav .main-nav .nav-link {
-    padding-left: 0;
-    padding-right: 0;
     white-space: nowrap;
   }
 
