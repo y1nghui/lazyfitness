@@ -42,7 +42,19 @@
           </div>
         </div>
       </div>
-      {% include 'shared/quick_chat_panel.html' with panel_prefix='dietPlanMessage' panel_id=plan.pk title='Message About Diet Plan' description='Send a quick care-team message about this diet plan.' partner_label='Fitness Coach' partner_name=plan.gym_user.assigned_coach.coach_name recent_messages=row.recent_messages can_message=row.ready post_url=diet_chat_url full_chat_url=diet_chat_url unavailable_text='Messaging becomes available after this gym user also has a coach assigned.' %}
+      {% include 'shared/quick_chat_panel.html' with 
+        panel_prefix='dietPlanMessage' 
+        panel_id=plan.pk 
+        title='Message About Diet Plan' 
+        description='Send a quick 
+        care-team message about this diet plan.'
+        partner_label='Fitness Coach' 
+        partner_name=plan.gym_user.assigned_coach.coach_name 
+        recent_messages=row.recent_messages 
+        can_message=row.ready post_url=diet_chat_url 
+        full_chat_url=diet_chat_url 
+        unavailable_text='Messaging becomes available after this gym user also has a coach assigned.' %}
+
     {% endwith %}
   {% empty %}
     <div class="col-12"><div class="empty-state">No diet plans yet. Create one from here or from an assigned user page.</div></div>

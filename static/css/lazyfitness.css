@@ -1407,3 +1407,70 @@ canvas {
   border: 2px solid #1e1e1e; /* Matches navbar background to make it 'cut out' of the icon */
   border-radius: 50%;
 }
+
+/* Navbar one-line desktop alignment fix */
+.nav-container {
+  flex-wrap: nowrap;
+}
+
+.navbar-brand {
+  flex-shrink: 0;
+}
+
+.justify-content-end { justify-content: flex-end !important; }
+.flex-row { flex-direction: row !important; }
+.flex-nowrap { flex-wrap: nowrap !important; }
+.flex-shrink-0 { flex-shrink: 0 !important; }
+.ms-1 { margin-left: .25rem !important; }
+
+@media (min-width: 992px) {
+  .navbar-expand-lg .navbar-toggler {
+    display: none;
+  }
+
+  #nav.navbar-collapse {
+    display: flex !important;
+    align-items: center;
+    flex-basis: auto;
+    flex-grow: 1;
+    min-width: 0;
+    width: 100%;
+  }
+
+  #nav .main-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1 1 auto;
+    min-width: 0;
+    gap: 1.6rem;
+    white-space: nowrap;
+  }
+
+  #nav .main-nav .nav-link {
+    padding-left: 0;
+    padding-right: 0;
+    white-space: nowrap;
+  }
+
+  #nav .nav-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex: 0 0 auto;
+    white-space: nowrap;
+    padding-left: .75rem;
+  }
+
+  #nav .nav-actions .nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: .5rem;
+    padding-bottom: .5rem;
+  }
+
+  #nav .profile-hover-dropdown .dropdown-toggle {
+    white-space: nowrap;
+  }
+}

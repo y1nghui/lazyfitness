@@ -9,7 +9,7 @@
   {% block extra_css %}{% endblock %}
 </head>
 <body>
-<nav class="navbar navbar-dark sticky-top" aria-label="Primary navigation">
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top" aria-label="Primary navigation">
   <div class="container nav-container">
     {% if user.is_authenticated %}
       {% if user.is_gym_user %}
@@ -32,9 +32,9 @@
     <div class="navbar-collapse collapse" id="nav">
       {% if user.is_authenticated %}
         
-        <ul class="navbar-nav mx-auto align-items-lg-center justify-content-lg-evenly flex-grow-1 px-lg-4">
+        <ul class="navbar-nav main-nav mx-auto align-items-lg-center justify-content-lg-center flex-grow-1 gap-lg-4 px-lg-3 flex-nowrap">
           {% if user.is_gym_user %}
-            <li class="nav-item"><a class="nav-link" href="{% url 'gym_user:goal_list' %}">Goals</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'gym_user:dashboard' %}">Dashboard</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'gym_user:workout_select' %}">Workouts</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'gym_user:schedule' %}">Schedule</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'gym_user:progress' %}">Progress</a></li>
@@ -42,19 +42,22 @@
             <li class="nav-item"><a class="nav-link" href="{% url 'accounts:submit_feedback' %}">Feedback</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'faq_public' %}">FAQ</a></li>
           {% elif user.is_coach %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'coach:dashboard' %}">Dashboard</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'coach:assigned_users' %}">Assigned Users</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'coach:plan_list' %}">Plans</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'coach:monitor_progress' %}">Progress</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'accounts:submit_feedback' %}">Feedback</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'faq_public' %}">FAQ</a></li>
           {% elif user.is_health_advisor %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'health_advisor:dashboard' %}">Dashboard</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'health_advisor:assigned_users' %}">Assigned Users</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'health_advisor:diet_plan_list' %}">Diet Plans</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'health_advisor:recommendation_list' %}">Recommendations</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'accounts:submit_feedback' %}">Feedback</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'faq_public' %}">FAQ</a></li>
           {% elif user.is_admin_user %}
-            <li class="nav-item"><a class="nav-link" href="{% url 'admin_panel:user_list' %}">Users Management</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'admin_panel:dashboard' %}">Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'admin_panel:user_list' %}">Users</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'admin_panel:login_activity_list' %}">Login Activity</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'admin_panel:faq_list' %}">FAQ Management</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'admin_panel:feedback_list' %}">Feedback Management</a></li>
@@ -70,7 +73,7 @@
           {% endif %}
         </ul>
 
-        <ul class="navbar-nav ms-auto flex-grow-1 align-items-center gap-2 gap-lg-3 px-lg-4 justify-content-center">
+        <ul class="navbar-nav nav-actions ms-lg-auto align-items-center gap-2 gap-lg-3 flex-row flex-nowrap justify-content-end">
           
           {% if not user.is_admin_user %}
           <li class="nav-item">
@@ -98,7 +101,7 @@
             </a>
           </li>
 
-          <li class="nav-item dropdown profile-hover-dropdown ms-2">
+          <li class="nav-item dropdown profile-hover-dropdown ms-1 flex-shrink-0">
             <a class="nav-link d-flex align-items-center gap-2 dropdown-toggle" href="#" role="button" data-lf-toggle="dropdown" aria-expanded="false">
               {% if user.profile_picture %}
                 <img src="{{ user.profile_picture.url }}" alt="{{ user.username }} profile picture" class="rounded-circle avatar-sm">
@@ -121,6 +124,7 @@
       {% else %}
         <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
           <li class="nav-item"><a class="nav-link" href="{% url 'faq_public' %}">FAQ</a></li>
+        <ul class="navbar-nav nav-actions ms-lg-auto align-items-lg-center gap-lg-3">
           <li class="nav-item"><a class="nav-link" href="{% url 'accounts:login' %}">Login</a></li>
           <li class="nav-item"><a class="btn btn-primary btn-sm" href="{% url 'accounts:register' %}">Start Your Fitness Journey</a></li>
         </ul>

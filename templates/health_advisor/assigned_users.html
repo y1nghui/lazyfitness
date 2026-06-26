@@ -1,8 +1,46 @@
 {% extends "shared/base.html" %}
 {% block title %}Assigned Users — LazyFitness{% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3 btn-toolbar-mobile"><h2 class="section-title mb-0">Assigned Gym Users</h2><a class="btn btn-outline-light" href="{% url 'health_advisor:dashboard' %}">Back to Dashboard</a></div>
-<div class="card p-3 mb-3"><form method="get" class="row g-2 align-items-end"><div class="col-md-3"><label class="form-label">Search</label><input class="form-control" name="q" value="{{ search }}"></div><div class="col-md-2"><label class="form-label">BMI</label><select name="bmi" class="form-select"><option value="">All</option>{% for cat in bmi_categories %}<option value="{{ cat }}" {% if bmi_filter == cat %}selected{% endif %}>{{ cat }}</option>{% endfor %}</select></div><div class="col-md-2"><label class="form-label">Unread</label><select name="unread" class="form-select"><option value="">Any</option><option value="yes" {% if unread_filter == 'yes' %}selected{% endif %}>Has unread</option><option value="no" {% if unread_filter == 'no' %}selected{% endif %}>No unread</option></select></div><div class="col-md-2"><label class="form-label">Diet Plan</label><select name="report" class="form-select"><option value="">Any</option><option value="yes" {% if report_filter == 'yes' %}selected{% endif %}>Has plan</option><option value="no" {% if report_filter == 'no' %}selected{% endif %}>No plan</option></select></div><div class="col-md-2"><label class="form-label">Recommendation</label><select name="rec_status" class="form-select"><option value="">Any</option>{% for value,label in recommendation_status_choices %}<option value="{{ value }}" {% if rec_status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div><div class="col-md-1"><button class="btn btn-primary w-100">Go</button></div></form></div>
+<div class="d-flex justify-content-between align-items-center mb-3 btn-toolbar-mobile">
+  <h2 class="section-title mb-0">Assigned Gym Users</h2>
+  <a class="btn btn-outline-light" href="{% url 'health_advisor:dashboard' %}">Back to Dashboard</a>
+</div>
+<div class="card p-3 mb-3">
+  <form method="get" class="row g-2 align-items-end">
+    <div class="col-md-3"><label class="form-label">Search</label>
+      <input class="form-control" name="q" value="{{ search }}">
+    </div>
+      <div class="col-md-2"><label class="form-label">BMI</label>
+        <select name="bmi" class="form-select"><option value="">All</option>
+          {% for cat in bmi_categories %}
+          <option value="{{ cat }}" {% if bmi_filter == cat %}selected{% endif %}>
+            {{ cat }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2"><label class="form-label">Unread</label>
+        <select name="unread" class="form-select"><option value="">Any</option>
+          <option value="yes" {% if unread_filter == 'yes' %}selected{% endif %}>Has unread</option>
+          <option value="no" {% if unread_filter == 'no' %}selected{% endif %}>No unread</option>
+        </select>
+      </div>
+      <div class="col-md-2"><label class="form-label">Diet Plan</label>
+        <select name="report" class="form-select"><option value="">Any</option>
+          <option value="yes" {% if report_filter == 'yes' %}selected{% endif %}>Has plan</option>
+          <option value="no" {% if report_filter == 'no' %}selected{% endif %}>No plan</option>
+        </select></div><div class="col-md-2"><label class="form-label">Recommendation</label>
+          <select name="rec_status" class="form-select">
+          <option value="">Any</option>
+          {% for value,label in recommendation_status_choices %}
+          <option value="{{ value }}" {% if rec_status == value %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-1"><button class="btn btn-primary w-100">Go</button>
+    </div>
+  </form>
+</div>
 <div class="row g-3">
 {% for row in rows %}
   <div class="col-lg-6">
@@ -58,7 +96,13 @@
     </div>
     <div class="offcanvas-body">
       <p class="text-secondary">Send a quick care-team message. Visible to {{ row.gym_user.user_name }}, you, and the assigned coach.</p>
-      <p class="small">Coach: {% if row.gym_user.assigned_coach %}<strong>{{ row.gym_user.assigned_coach.coach_name }}</strong>{% else %}<span class="text-secondary">Not assigned</span>{% endif %}</p>
+      <p class="small">Coach: 
+        {% if row.gym_user.assigned_coach %}
+        <strong>{{ row.gym_user.assigned_coach.coach_name }}</strong>
+        {% else %}
+        <span class="text-secondary">Not assigned</span>
+        {% endif %}
+      </p>
       {% if row.recent_messages %}
         <div class="mini-chat mb-3">
           {% for msg in row.recent_messages reversed %}

@@ -12,7 +12,16 @@
   </div>
 </div>
 
-{% include 'shared/quick_chat_panel.html' with panel_id='dietDetailMessagePanel' title='Message About Diet Plan' description='Send a quick care-team message while reviewing this diet plan.' partner_label='Fitness Coach' partner_name=plan.gym_user.assigned_coach.coach_name recent_messages=recent_messages can_message=can_message post_url=diet_detail_chat_url full_chat_url=diet_detail_chat_url unavailable_text='Messaging becomes available after this gym user also has a coach assigned.' %}
+{% include 'shared/quick_chat_panel.html' with panel_id='dietDetailMessagePanel' 
+  title='Message About Diet Plan' 
+  description='Send a quick care-team message while reviewing this diet plan.' 
+  partner_label='Fitness Coach' 
+  partner_name=plan.gym_user.assigned_coach.coach_name 
+  recent_messages=recent_messages 
+  can_message=can_message 
+  post_url=diet_detail_chat_url 
+  full_chat_url=diet_detail_chat_url 
+  unavailable_text='Messaging becomes available after this gym user also has a coach assigned.' %}
 
 <div class="row g-4">
   <div class="col-lg-8">

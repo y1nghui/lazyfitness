@@ -48,6 +48,16 @@
 
 {% for row in user_rows %}
   {% url 'health_advisor:message_thread' row.gym_user.pk as advisor_chat_url %}
-  {% include 'shared/quick_chat_panel.html' with panel_prefix='advisorDashboardMessage' panel_id=row.gym_user.pk title='Message Gym User' description='Send a quick care-team message from your dashboard.' partner_label='Fitness Coach' partner_name=row.gym_user.assigned_coach.coach_name recent_messages=row.recent_messages can_message=row.ready post_url=advisor_chat_url full_chat_url=advisor_chat_url unavailable_text='Messaging becomes available after this gym user also has a coach assigned.' %}
+  {% include 'shared/quick_chat_panel.html' with panel_prefix='advisorDashboardMessage' 
+  panel_id=row.gym_user.pk 
+  title='Message Gym User' 
+  description='Send a quick care-team message from your dashboard.' 
+  partner_label='Fitness Coach' 
+  partner_name=row.gym_user.assigned_coach.coach_name 
+  recent_messages=row.recent_messages 
+  can_message=row.ready 
+  post_url=advisor_chat_url 
+  full_chat_url=advisor_chat_url 
+  unavailable_text='Messaging becomes available after this gym user also has a coach assigned.' %}
 {% endfor %}
 {% endblock %}

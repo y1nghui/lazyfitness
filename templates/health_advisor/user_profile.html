@@ -1,7 +1,15 @@
 {% extends "shared/base.html" %}
 {% block title %}{{ gym_user.user_name }} — LazyFitness{% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3 btn-toolbar-mobile"><div><h2 class="section-title mb-0">{{ gym_user.user_name }}</h2><p class="text-secondary mb-0">Selected-user health advisor detail page.</p></div><div class="d-flex flex-wrap gap-2"><a class="btn btn-primary" href="{% url 'health_advisor:message_thread' gym_user.pk %}">Message</a><a class="btn btn-outline-warning" href="{% url 'health_advisor:recommendation_send' gym_user.pk %}?next={{ request.get_full_path|urlencode }}">Recommend</a><a class="btn btn-outline-success" href="{% url 'health_advisor:diet_plan_update' gym_user.pk %}?next={{ request.get_full_path|urlencode }}">Diet Plan</a></div></div>
+<div class="d-flex justify-content-between align-items-center mb-3 btn-toolbar-mobile"><div>
+    <h2 class="section-title mb-0">{{ gym_user.user_name }}</h2>
+    <p class="text-secondary mb-0">Selected-user health advisor detail page.</p>
+</div>
+<div class="d-flex flex-wrap gap-2">
+    <a class="btn btn-primary" href="{% url 'health_advisor:message_thread' gym_user.pk %}">Message</a>
+    <a class="btn btn-outline-warning" href="{% url 'health_advisor:recommendation_send' gym_user.pk %}?next={{ request.get_full_path|urlencode }}">Recommend</a>
+    <a class="btn btn-outline-success" href="{% url 'health_advisor:diet_plan_update' gym_user.pk %}?next={{ request.get_full_path|urlencode }}">Diet Plan</a>
+</div>
 <div class="row g-4">
     <div class="col-lg-4">
         <div class="card p-3 mb-3">
