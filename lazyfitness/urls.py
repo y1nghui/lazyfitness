@@ -11,6 +11,7 @@ urlpatterns = [
     path('admin/<path:path>/', RedirectView.as_view(url='/admin-panel/%(path)s', permanent=False)),
     path('django-admin/', admin.site.urls),
     path('', views.landing, name='landing'),
+    path('faq/', views.faq_public, name='faq_public'),
     path('accounts/', include('apps.accounts.urls', namespace='accounts')),
     path('gym/', include('apps.gym_user.urls', namespace='gym_user')),
     path('coach/', include('apps.coach.urls', namespace='coach')),

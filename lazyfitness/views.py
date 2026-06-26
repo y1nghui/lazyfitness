@@ -1,13 +1,20 @@
 """Project-level public pages and error handlers."""
 from django.shortcuts import render
 
+from apps.admin_panel.models import FAQ
 from .public_team import get_public_care_team
 
 
 def landing(request):
     """Public home page with active coach/advisor promotion cards."""
     context = get_public_care_team(limit=6)
+    context['faqs'] = FAQ.objects.order_by('-updated_at')[:3]
     return render(request, 'shared/landing.html', context)
+
+
+def faq_public(request):
+    faqs = FAQ.objects.order_by('-updated_at')
+    return render(request, 'shared/faq.html', {'faqs': faqs})
 
 
 def error_page(request, title='Something went wrong', message='Please try again or return to the dashboard.', status=400):
