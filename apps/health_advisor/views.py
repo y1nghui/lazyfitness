@@ -246,7 +246,15 @@ def diet_plan_edit(request, plan_id):
         'mode': 'Edit',
         'cancel_url': safe_back_url(request, reverse('health_advisor:diet_plan_detail', args=[plan.id])),
     })
-
+    
+@health_advisor_required
+def diet_plan_delete(request, plan_id):
+    advisor = get_object_or_404(HealthAdvisor, user=request.user)
+    plan = get_object_or_404(DietPlan, pk=plan_id, advisor=advisor, gym_user__assigned_advisor=advisor)
+    if request.method == 'POST':
+        plan.delete()
+        messages.success(request, 'Diet plan deleted.')
+    return redirect(safe_back_url(request, reverse('health_advisor:diet_plan_list')))
 
 @health_advisor_required
 def recommendation_list(request):

@@ -13,6 +13,7 @@ urlpatterns = [
     path('diet-plans/<int:user_id>/edit/', views.diet_plan_update, name='diet_plan_update'),
     path('diet-plans/detail/<int:plan_id>/', views.diet_plan_detail, name='diet_plan_detail'),
     path('diet-plans/detail/<int:plan_id>/edit/', views.diet_plan_edit, name='diet_plan_edit'),
+    path('diet-plans/detail/<int:plan_id>/delete/', views.diet_plan_delete, name='diet_plan_delete'),
     path('recommendations/', views.recommendation_list, name='recommendation_list'),
     path('recommendations/<int:user_id>/new/', views.recommendation_send, name='recommendation_send'),
     path('recommendations/<int:recommendation_id>/edit/', views.recommendation_edit, name='recommendation_edit'),
