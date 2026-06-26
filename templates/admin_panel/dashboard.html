@@ -29,7 +29,26 @@
   </div>
 </div>
 <div class="row g-4">
-  <div class="col-lg-6"><div class="card p-3"><h5>Quick Admin Actions</h5><div class="d-flex flex-wrap gap-2"><a class="btn btn-primary" href="{% url 'admin_panel:user_list' %}?role=gym_user&assignment=both_missing">Find unassigned users</a><a class="btn btn-outline-light" href="{% url 'admin_panel:user_add' %}">Add User</a><a class="btn btn-outline-light" href="{% url 'admin_panel:login_activity_list' %}">Login Activity</a></div></div></div>
-  <div class="col-lg-6"><div class="card p-3"><h5>Recent System Logs</h5>{% for log in recent_logs %}<div class="border-bottom border-secondary-subtle py-2"><strong>{{ log.get_event_display }}</strong><div class="small text-secondary">{{ log.description|truncatewords:14 }}</div></div>{% empty %}<div class="empty-state">No logs yet.</div>{% endfor %}</div></div>
+  <div class="col-lg-6">
+    <div class="card p-3"><h5>Quick Admin Actions</h5>
+      <div class="d-flex flex-wrap gap-2"><a class="btn btn-primary" href="{% url 'admin_panel:user_list' %}?role=gym_user&assignment=both_missing">Find unassigned users</a>
+        <a class="btn btn-outline-light" href="{% url 'admin_panel:user_add' %}">Add User</a><a class="btn btn-outline-light" href="{% url 'admin_panel:login_activity_list' %}">Login Activity</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card p-3">
+      <h5>Recent System Logs</h5>{% for log in recent_logs %}
+      <div class="border-bottom border-secondary-subtle py-2">
+        <strong>{{ log.get_event_display }}</strong>
+        <div class="small text-secondary">
+          {{ log.description|truncatewords:14 }}
+        </div>
+      </div>
+      {% empty %}<div class="empty-state">No logs yet.
+      </div>
+      {% endfor %}
+    </div>
+  </div>
 </div>
 {% endblock %}

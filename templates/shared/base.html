@@ -40,16 +40,19 @@
             <li class="nav-item"><a class="nav-link" href="{% url 'gym_user:progress' %}">Progress</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'gym_user:recommendation_list' %}">Recommendations</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'accounts:submit_feedback' %}">Feedback</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'faq_public' %}">FAQ</a></li>
           {% elif user.is_coach %}
             <li class="nav-item"><a class="nav-link" href="{% url 'coach:assigned_users' %}">Assigned Users</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'coach:plan_list' %}">Plans</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'coach:monitor_progress' %}">Progress</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'accounts:submit_feedback' %}">Feedback</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'faq_public' %}">FAQ</a></li>
           {% elif user.is_health_advisor %}
             <li class="nav-item"><a class="nav-link" href="{% url 'health_advisor:assigned_users' %}">Assigned Users</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'health_advisor:diet_plan_list' %}">Diet Plans</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'health_advisor:recommendation_list' %}">Recommendations</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'accounts:submit_feedback' %}">Feedback</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'faq_public' %}">FAQ</a></li>
           {% elif user.is_admin_user %}
             <li class="nav-item"><a class="nav-link" href="{% url 'admin_panel:user_list' %}">Users Management</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'admin_panel:login_activity_list' %}">Login Activity</a></li>
@@ -117,6 +120,7 @@
 
       {% else %}
         <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
+          <li class="nav-item"><a class="nav-link" href="{% url 'faq_public' %}">FAQ</a></li>
           <li class="nav-item"><a class="nav-link" href="{% url 'accounts:login' %}">Login</a></li>
           <li class="nav-item"><a class="btn btn-primary btn-sm" href="{% url 'accounts:register' %}">Start Your Fitness Journey</a></li>
         </ul>
