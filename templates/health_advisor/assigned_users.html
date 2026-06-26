@@ -137,6 +137,62 @@
       {% endif %}
     </div>
   </div>
+
+  {# Recommend offcanvas #}
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="rec{{ row.gym_user.pk }}">
+    <div class="offcanvas-header">
+      <h5>Send Recommendation to {{ row.gym_user.user_name }}</h5>
+      <button class="btn-close btn-close-white" data-lf-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+      <p class="text-secondary">The gym user controls read/completed/dismissed actions.</p>
+      <form method="post" action="{% url 'health_advisor:recommendation_send' row.gym_user.pk %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <div class="mb-3">
+          <label class="form-label">Subject</label>
+          <input class="form-control" type="text" name="subject" required placeholder="Recommendation subject">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Advice</label>
+          <textarea class="form-control" name="advice" rows="5" required placeholder="Write your health advice here..."></textarea>
+        </div>
+        <div class="d-flex gap-2">
+          <button class="btn btn-warning">Send Recommendation</button>
+          <a class="btn btn-outline-light" href="{% url 'health_advisor:recommendation_send' row.gym_user.pk %}?next={{ request.get_full_path|urlencode }}">Full Form</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  {# Diet Plan offcanvas #}
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="diet{{ row.gym_user.pk }}">
+    <div class="offcanvas-header">
+      <h5>Diet Plan for {{ row.gym_user.user_name }}</h5>
+      <button class="btn-close btn-close-white" data-lf-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+      {% if row.latest_diet_plan %}
+        <div class="card p-3 mb-3">
+          <div class="d-flex justify-content-between align-items-start">
+            <strong>{{ row.latest_diet_plan.title }}</strong>
+            <span class="badge bg-info text-dark">{{ row.latest_diet_plan.get_status_display }}</span>
+          </div>
+          <p class="small text-secondary mt-1">{{ row.latest_diet_plan.target_goal|default:"No target goal" }}</p>
+          <div class="d-flex gap-2">
+            <a class="btn btn-sm btn-outline-light" href="{% url 'health_advisor:diet_plan_detail' row.latest_diet_plan.pk %}">View Plan</a>
+            <a class="btn btn-sm btn-outline-warning" href="{% url 'health_advisor:diet_plan_edit' row.latest_diet_plan.pk %}?next={{ request.get_full_path|urlencode }}">Edit Plan</a>
+          </div>
+        </div>
+      {% else %}
+        <div class="empty-state mb-3">No diet plan yet for this user.</div>
+      {% endif %}
+      <a class="btn btn-success w-100" href="{% url 'health_advisor:diet_plan_update' row.gym_user.pk %}?next={{ request.get_full_path|urlencode }}">
+        Create New Diet Plan
+      </a>
+    </div>
+  </div>
+
 </div>
 {% endfor %}
 {% include 'shared/pagination.html' %}
