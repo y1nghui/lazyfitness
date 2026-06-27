@@ -1,3 +1,4 @@
+
 {% extends "shared/base.html" %}
 {% block title %}{{ mode }} Diet Plan — LazyFitness{% endblock %}
 {% block content %}
@@ -16,6 +17,7 @@
                         <div class="col-md-{% if field.name in 'description meal_notes restrictions_allergies' %}12{% else %}6{% endif %}">
                             <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                             {{ field }}
+                            {% if field.help_text %}<div class="form-text text-secondary">{{ field.help_text }}</div>{% endif %}
                             {% for error in field.errors %}
                                 <div class="text-danger small">{{ error }}</div>
                             {% endfor %}

@@ -1,4 +1,5 @@
-﻿{% extends "shared/base.html" %}
+﻿
+{% extends "shared/base.html" %}
 {% block title %}Diet Plans — LazyFitness{% endblock %}
 
 {% block content %}
@@ -18,6 +19,7 @@
     <div class="col-md-2"><button class="btn btn-primary w-100">Filter</button></div>
   </form>
 </div>
+
 <div class="row g-3">
   {% for row in plan_rows %}
     {% with plan=row.plan %}
@@ -28,16 +30,41 @@
             <span class="badge bg-info text-dark">{{ plan.get_status_display }}</span>
           </div>
           <div class="small text-secondary mb-2">
-            {{ plan.gym_user.user_name }} · {% if plan.start_date %}{{ plan.start_date|date:"d M Y" }}{% else %}No start date{% endif %}
+            Assigned to:
+            {% if row.assigned_users %}
+              {% for gym_user in row.assigned_users %}{{ gym_user.user_name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+            {% else %}
+              Unassigned
+            {% endif %}
+            &middot; {% if plan.start_date %}{{ plan.start_date|date:"d M Y" }}{% else %}No start date{% endif %}
           </div>
           <p class="text-secondary mb-3">{{ plan.description|truncatewords:24|default:"No description." }}</p>
           <div class="d-flex gap-2 flex-wrap mt-auto">
             <a class="btn btn-sm btn-outline-light" href="{% url 'health_advisor:diet_plan_detail' plan.pk %}">View</a>
             <a class="btn btn-sm btn-outline-warning" href="{% url 'health_advisor:diet_plan_edit' plan.pk %}">Edit</a>
-            <a class="btn btn-sm btn-outline-danger" href="{% url 'health_advisor:diet_plan_delete' plan.pk %}">Delete</a>
+            <button class="btn btn-sm btn-outline-danger" type="button" data-lf-toggle="modal" data-lf-target="#delModal{{ plan.pk }}">Delete</button>
           </div>
         </div>
       </div>
+
+      <div class="modal fade" id="delModal{{ plan.pk }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content bg-dark text-white">
+            <div class="modal-body p-4">
+              <h6 class="mb-1">Delete Diet Plan</h6>
+              <p class="text-secondary small mb-3">Are you sure you want to delete <strong>{{ plan.title }}</strong>? This cannot be undone.</p>
+              <div class="d-flex gap-2">
+                <form method="post" action="{% url 'health_advisor:diet_plan_delete' plan.pk %}">
+                  {% csrf_token %}
+                  <button class="btn btn-danger btn-sm">Yes, Delete</button>
+                </form>
+                <button class="btn btn-outline-light btn-sm" data-lf-dismiss="modal">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     {% endwith %}
   {% empty %}
     <div class="col-12"><div class="empty-state">No diet plans yet. Create one from here or from an assigned user page.</div></div>

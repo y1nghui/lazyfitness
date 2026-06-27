@@ -1,18 +1,15 @@
+
 {% extends "shared/base.html" %}
 {% block title %}{{ plan.title }} — LazyFitness{% endblock %}
 
 {% block content %}
-{% url 'health_advisor:message_thread' plan.gym_user.pk as diet_detail_chat_url %}
 <div class="d-flex justify-content-between align-items-center mb-3 btn-toolbar-mobile">
   <h2 class="section-title mb-0">{{ plan.title }}</h2>
   <div class="d-flex gap-2 flex-wrap">
-    <button class="btn btn-primary" type="button" data-lf-toggle="offcanvas" data-lf-target="#dietDetailMessagePanel">Message</button>
     <a class="btn btn-outline-warning" href="{% url 'health_advisor:diet_plan_edit' plan.pk %}">Edit</a>
     <a class="btn btn-outline-light" href="{% url 'health_advisor:diet_plan_list' %}">All Diet Plans</a>
   </div>
 </div>
-
-{% include 'shared/quick_chat_panel.html' with panel_id='dietDetailMessagePanel' title='Message About Diet Plan' description='Send a quick care-team message while reviewing this diet plan.' partner_label='Fitness Coach' partner_name=plan.gym_user.assigned_coach.coach_name recent_messages=recent_messages can_message=can_message post_url=diet_detail_chat_url full_chat_url=diet_detail_chat_url unavailable_text='Messaging becomes available after this gym user also has a coach assigned.' %}
 
 <div class="row g-4">
   <div class="col-lg-8">
@@ -30,7 +27,16 @@
   <div class="col-lg-4">
     <div class="card p-3">
       <h5>Plan Info</h5>
-      <p><strong>User:</strong> {{ plan.gym_user.user_name }}</p>
+      <p class="mb-1"><strong>Assigned users:</strong></p>
+      {% if assigned_users %}
+        <ul class="mb-3 ps-3">
+          {% for gym_user in assigned_users %}
+            <li>{{ gym_user.user_name }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-secondary">No users assigned yet</p>
+      {% endif %}
       <p><strong>Goal:</strong> {{ plan.target_goal|default:"—" }}</p>
       <p><strong>Calories:</strong> {{ plan.daily_calorie_target|default:"—" }}</p>
       <p><strong>Dates:</strong> {{ plan.start_date|default:"—" }} to {{ plan.end_date|default:"—" }}</p>

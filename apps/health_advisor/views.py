@@ -24,6 +24,25 @@ def _next_or(request, fallback):
     return safe_next_url(request.POST.get('next') or request.GET.get('next'), fallback)
 
 
+def _diet_plan_queryset_for_advisor(advisor):
+    return DietPlan.objects.filter(advisor=advisor).prefetch_related('gym_users').distinct()
+
+
+def _create_diet_plan_assignment_records(advisor, plan, gym_user):
+    HealthReport.objects.create(
+        advisor=advisor,
+        gym_user=gym_user,
+        diet_plan=plan.meal_notes or plan.description,
+        notes=f'Diet plan created: {plan.title}',
+    )
+    notify_user(
+        gym_user.user,
+        'Diet plan assigned',
+        f'{advisor.advisor_name} assigned a diet plan: {plan.title}.',
+        reverse('gym_user:dashboard'),
+    )
+
+
 @health_advisor_required
 def dashboard(request):
     advisor = get_object_or_404(HealthAdvisor, user=request.user)
@@ -51,7 +70,7 @@ def dashboard(request):
         'assigned_count': assigned.count(),
         'diet_plan_count': advisor.diet_plans.count(),
         'recent_reports': advisor.reports.filter(gym_user__assigned_advisor=advisor).select_related('gym_user').order_by('-date')[:5],
-        'recent_diet_plans': advisor.diet_plans.filter(gym_user__assigned_advisor=advisor).select_related('gym_user')[:5],
+        'recent_diet_plans': advisor.diet_plans.prefetch_related('gym_users')[:5],
         'recent_recommendations': advisor.recommendations.filter(gym_user__assigned_advisor=advisor).order_by('-created_at')[:5],
     }
     return render(request, 'health_advisor/dashboard.html', context)
@@ -142,22 +161,16 @@ def user_profile(request, user_id):
 @health_advisor_required
 def diet_plan_list(request):
     advisor = get_object_or_404(HealthAdvisor, user=request.user)
-    plans = advisor.diet_plans.filter(gym_user__assigned_advisor=advisor).select_related('gym_user').all()
+    plans = _diet_plan_queryset_for_advisor(advisor)
     status = request.GET.get('status', '')
     if status:
         plans = plans.filter(status=status)
     page_obj, page_query = paginate(request, plans, per_page=20)
     plan_rows = []
     for plan in page_obj.object_list:
-        gym_user = plan.gym_user
-        ready = care_team_ready(gym_user)
-        conversation = get_or_create_conversation(gym_user) if ready else getattr(gym_user, 'conversation', None)
         plan_rows.append({
             'plan': plan,
-            'ready': ready,
-            'conversation': conversation,
-            'recent_messages': conversation.messages.select_related('sender').order_by('-created_at')[:5] if conversation else [],
-            'unread_count': conversation_unread_count(conversation, request.user) if conversation else 0,
+            'assigned_users': list(plan.gym_users.all()),
         })
     return render(request, 'health_advisor/diet_plan_list.html', {
         'advisor': advisor,
@@ -182,28 +195,27 @@ def diet_plan_create(request, user_id=None):
             plan = form.save(commit=False)
             plan.advisor = advisor
             plan.save()
-            HealthReport.objects.create(
-                advisor=advisor,
-                gym_user=plan.gym_user,
-                diet_plan=plan.meal_notes or plan.description,
-                notes=f'Diet plan created: {plan.title}',
-            )
-            notify_user(
-                plan.gym_user.user,
-                'Diet plan assigned',
-                f'{advisor.advisor_name} assigned a diet plan: {plan.title}.',
-                reverse('gym_user:dashboard'),
-            )
-            messages.success(request, 'Diet plan saved and assigned successfully.')
+            form.save_m2m()
+            assigned_users = list(plan.gym_users.select_related('user').all())
+            for gym_user in assigned_users:
+                _create_diet_plan_assignment_records(advisor, plan, gym_user)
+            if assigned_users:
+                messages.success(request, 'Diet plan saved and assigned successfully.')
+            else:
+                messages.success(request, 'Diet plan saved as an unassigned reusable template.')
             return redirect(safe_back_url(request, reverse('health_advisor:diet_plan_detail', args=[plan.id])))
         messages.error(request, 'Please correct the highlighted diet plan errors.')
     else:
         form = DietPlanForm(advisor=advisor, initial_user=initial_user)
+    import json
+    advisor_users = advisor.assigned_gym_users.select_related('user').all()
+    user_conditions = {str(u.pk): u.medical_condition or '' for u in advisor_users}
     return render(request, 'health_advisor/diet_plan_form.html', {
         'form': form,
         'gym_user': initial_user,
         'mode': 'Create',
         'cancel_url': safe_back_url(request, reverse('health_advisor:diet_plan_list')),
+        'user_conditions_json': json.dumps(user_conditions),
     })
 
 
@@ -215,42 +227,47 @@ def diet_plan_update(request, user_id):
 @health_advisor_required
 def diet_plan_detail(request, plan_id):
     advisor = get_object_or_404(HealthAdvisor, user=request.user)
-    plan = get_object_or_404(DietPlan, pk=plan_id, advisor=advisor, gym_user__assigned_advisor=advisor)
-    ready = care_team_ready(plan.gym_user)
-    conversation = get_or_create_conversation(plan.gym_user) if ready else getattr(plan.gym_user, 'conversation', None)
+    plan = get_object_or_404(_diet_plan_queryset_for_advisor(advisor), pk=plan_id)
     return render(request, 'health_advisor/diet_plan_detail.html', {
         'advisor': advisor,
         'plan': plan,
-        'can_message': ready,
-        'recent_messages': conversation.messages.select_related('sender').order_by('-created_at')[:5] if conversation else [],
+        'assigned_users': list(plan.gym_users.all()),
     })
 
 
 @health_advisor_required
 def diet_plan_edit(request, plan_id):
     advisor = get_object_or_404(HealthAdvisor, user=request.user)
-    plan = get_object_or_404(DietPlan, pk=plan_id, advisor=advisor, gym_user__assigned_advisor=advisor)
+    plan = get_object_or_404(_diet_plan_queryset_for_advisor(advisor), pk=plan_id)
+    previous_user_ids = set(plan.gym_users.values_list('pk', flat=True))
     if request.method == 'POST':
         form = DietPlanForm(request.POST, instance=plan, advisor=advisor)
         if form.is_valid():
-            form.save()
+            plan = form.save()
+            assigned_users = list(plan.gym_users.select_related('user').all())
+            for gym_user in assigned_users:
+                if gym_user.pk not in previous_user_ids:
+                    _create_diet_plan_assignment_records(advisor, plan, gym_user)
             messages.success(request, 'Diet plan updated successfully.')
             return redirect(safe_back_url(request, reverse('health_advisor:diet_plan_detail', args=[plan.id])))
         messages.error(request, 'Please correct the highlighted diet plan errors.')
     else:
         form = DietPlanForm(instance=plan, advisor=advisor)
+    import json
+    advisor_users = advisor.assigned_gym_users.select_related('user').all()
+    user_conditions = {str(u.pk): u.medical_condition or '' for u in advisor_users}
     return render(request, 'health_advisor/diet_plan_form.html', {
         'form': form,
-        'gym_user': plan.gym_user,
         'plan': plan,
         'mode': 'Edit',
         'cancel_url': safe_back_url(request, reverse('health_advisor:diet_plan_detail', args=[plan.id])),
+        'user_conditions_json': json.dumps(user_conditions),
     })
     
 @health_advisor_required
 def diet_plan_delete(request, plan_id):
     advisor = get_object_or_404(HealthAdvisor, user=request.user)
-    plan = get_object_or_404(DietPlan, pk=plan_id, advisor=advisor, gym_user__assigned_advisor=advisor)
+    plan = get_object_or_404(_diet_plan_queryset_for_advisor(advisor), pk=plan_id)
     if request.method == 'POST':
         plan.delete()
         messages.success(request, 'Diet plan deleted.')

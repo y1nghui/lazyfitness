@@ -46,7 +46,7 @@ class DietPlan(models.Model):
     ]
 
     advisor = models.ForeignKey(HealthAdvisor, on_delete=models.CASCADE, related_name='diet_plans')
-    gym_user = models.ForeignKey('gym_user.GymUser', on_delete=models.CASCADE, related_name='diet_plans')
+    gym_users = models.ManyToManyField('gym_user.GymUser', blank=True, related_name='diet_plans')
     title = models.CharField(max_length=180)
     description = models.TextField(blank=True)
     target_goal = models.CharField(max_length=160, blank=True)
@@ -63,7 +63,7 @@ class DietPlan(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"{self.title} for {self.gym_user.user_name}"
+        return self.title
 
 
 class Recommendation(models.Model):
@@ -92,3 +92,4 @@ class Recommendation(models.Model):
 
     def __str__(self):
         return f"Rec: {self.subject} → {self.gym_user.user_name}"
+    
