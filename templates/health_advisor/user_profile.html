@@ -1,113 +1,178 @@
+
 {% extends "shared/base.html" %}
 {% block title %}{{ gym_user.user_name }} — LazyFitness{% endblock %}
+
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3 btn-toolbar-mobile"><div>
-    <h2 class="section-title mb-0">{{ gym_user.user_name }}</h2>
-    <p class="text-secondary mb-0">Selected-user health advisor detail page.</p>
+<div>
+    <h2 class="section-title mb-1">{{ gym_user.user_name }}</h2>
+    <p class="ha-profile-muted mb-0">@{{ gym_user.user.username }}</p>
 </div>
-<div class="d-flex flex-wrap gap-2">
-    <a class="btn btn-primary" href="{% url 'health_advisor:message_thread' gym_user.pk %}">Message</a>
-    <a class="btn btn-outline-warning" href="{% url 'health_advisor:recommendation_send' gym_user.pk %}?next={{ request.get_full_path|urlencode }}">Recommend</a>
-    <a class="btn btn-outline-success" href="{% url 'health_advisor:diet_plan_update' gym_user.pk %}?next={{ request.get_full_path|urlencode }}">Diet Plan</a>
-</div>
-<div class="row g-4">
-    <div class="col-lg-4">
-        <div class="card p-3 mb-3">
-            <h4>Health Metrics</h4>
-            <p>BMI: {{ bmi|default:"—" }} 
-                <span class="badge bg-secondary">{{ bmi_category }}</span>
-            </p>
-            <p>Weight: {{ gym_user.weight }} kg
-                <br>Height: {{ gym_user.height }} cm
-                <br>Waist: {{ gym_user.waist_in_cm }} cm
-                <br>Neck: {{ gym_user.neck_in_cm }} cm
-                <br>Calories: {{ gym_user.calorie_intake }} kcal
-            </p>
-        </div>
-        <div class="card p-3 mb-3">
-            <h4>Latest Measurements</h4>
-            {% for item in measurements %}
-            <div class="border-bottom border-secondary py-2">
-                <strong>{{ item.recorded_at|date:"d M Y" }}</strong>
-                <br>{{ item.weight }} kg · waist {{ item.waist_in_cm }} cm
-            </div>
-            {% empty %}
-            <div class="empty-state">No measurements yet.</div>
-            {% endfor %}
-        </div>
-        <div class="card p-3">
-            <h4>Latest Diet Plan</h4>
-            {% with latest=diet_plans.0 %}
-            {% if latest %}
-            <strong>{{ latest.title }}</strong>
-            <br>
-            <span class="badge bg-secondary">{{ latest.get_status_display }}</span>
-            <p class="small text-secondary mt-2">{{ latest.target_goal|default:"No target goal" }}</p>
-            <a class="btn btn-sm btn-outline-light" href="{% url 'health_advisor:diet_plan_detail' latest.pk %}">View Plan</a>
-            {% else %}
-            <div class="empty-state">No diet plan yet.</div>
-            {% endif %}
-            {% endwith %}
-        </div>
+<div style="display: flex; justify-content: flex-start; gap: 0.5rem; margin-top: 1rem;" class="ha-profile-summary-strip">
+    <div class="ha-profile-detail-actions">
+      <a class="btn btn-primary" href="{% url 'health_advisor:message_thread' gym_user.pk %}">Message</a>
+      <a class="btn btn-outline-warning" href="{% url 'health_advisor:recommendation_send' gym_user.pk %}?next={{ request.get_full_path|urlencode }}">Recommend</a>
+      <a class="btn btn-outline-success" href="{% url 'health_advisor:diet_plan_update' gym_user.pk %}?next={{ request.get_full_path|urlencode }}">Diet Plan</a>
     </div>
+</div>
+  </div>
+  <div class="row g-4 align-items-start">
     <div class="col-lg-8">
-        <div class="card p-3 mb-3">
-            <h4>Recent Workout Logs</h4>
-            <div class="table-responsive">
-                <table class="table table-dark table-sm">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Plan</th>
-                            <th>Duration</th>
-                            <th>Reps</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for log in logs %}
-                        <tr>
-                            <td>{{ log.logged_at|date:"d M Y" }}</td>
-                            <td>{{ log.plan.plan_name|default:"—" }}</td>
-                            <td>{{ log.workout_duration }} min</td>
-                            <td>{{ log.reps_completed }}</td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="4" class="text-secondary">No logs yet.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+      <div class="card ha-profile-card p-3 mb-3">
+        <div class="ha-profile-card-title-row">
+          <h5>Health Metrics</h5>
+          <span class="ha-profile-muted">Current user data</span>
         </div>
-        <div class="card p-3 mb-3">
-            <h4>Diet Plan History</h4>
-            {% for plan in diet_plans %}
-            <div class="border-bottom border-secondary py-2">
+        <div class="ha-profile-metric-list">
+          <div>
+            <span>BMI</span>
+            <strong>{{ bmi|default:"—" }}</strong>
+            <small class="badge bg-secondary">{{ bmi_category }}</small>
+          </div>
+          <div>
+            <span>Weight</span>
+            <strong>{{ gym_user.weight|default:"—" }} kg</strong>
+          </div>
+          <div>
+            <span>Height</span>
+            <strong>{{ gym_user.height|default:"—" }} cm</strong>
+          </div>
+          <div>
+            <span>Waist</span>
+            <strong>{{ gym_user.waist_in_cm|default:"—" }} cm</strong>
+          </div>
+          <div>
+            <span>Neck</span>
+            <strong>{{ gym_user.neck_in_cm|default:"—" }} cm</strong>
+          </div>
+          <div>
+            <span>Calories</span>
+            <strong>{{ gym_user.calorie_intake|default:"—" }} kcal</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="card ha-profile-card p-3 mb-3">
+        <div class="ha-profile-card-title-row">
+          <h5>Latest Measurements</h5>
+          <span class="ha-profile-muted">Recent 5</span>
+        </div>
+        <div class="ha-profile-timeline-list">
+          {% for item in measurements %}
+            <div class="ha-profile-list-row">
+              <div>
+                <strong>{{ item.recorded_at|date:"d M Y" }}</strong>
+                <p>{{ item.weight }} kg · waist {{ item.waist_in_cm }} cm · neck {{ item.neck_in_cm }} cm</p>
+              </div>
+              <span>{{ item.calorie_intake }} kcal</span>
+            </div>
+          {% empty %}
+            <p class="ha-profile-empty mb-0">No measurements yet.</p>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="card ha-profile-card p-3 mb-3">
+        <div class="ha-profile-card-title-row">
+          <h5>Diet Plan History</h5>
+          <span class="ha-profile-muted">{{ diet_plans|length }} shown</span>
+        </div>
+        <div class="ha-profile-timeline-list">
+          {% for plan in diet_plans %}
+            <div class="ha-profile-list-row">
+              <div>
                 <strong>{{ plan.title }}</strong>
-                <span class="badge bg-secondary">{{ plan.get_status_display }}</span>
-                <div class="small text-secondary">
-                    {{ plan.created_at|date:"d M Y" }} · {{ plan.target_goal|default:"No target" }}
-                </div>
+                <p>{{ plan.created_at|date:"d M Y" }} · {{ plan.target_goal|default:"No target goal" }}</p>
+              </div>
+              <span class="badge bg-secondary">{{ plan.get_status_display }}</span>
             </div>
-            {% empty %}
-            <p class="text-secondary">No diet plans yet.</p>
-            {% endfor %}
+          {% empty %}
+            <p class="ha-profile-empty mb-0">No diet plans yet.</p>
+          {% endfor %}
         </div>
-        <div class="card p-3">
-            <h4>Recommendations and Statuses</h4>
-            {% for rec in recommendations %}
-            <div class="border-bottom border-secondary py-2">
+      </div>
+
+      <div class="card ha-profile-card p-3">
+        <div class="ha-profile-card-title-row">
+          <h5>Recent Workout Logs</h5>
+          <span class="ha-profile-muted">Latest activity</span>
+        </div>
+        <div class="ha-profile-table-wrap">
+          <table class="ha-profile-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Plan</th>
+                <th>Duration</th>
+                <th>Reps</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for log in logs %}
+                <tr>
+                  <td>{{ log.logged_at|date:"d M Y" }}</td>
+                  <td>{{ log.plan.plan_name|default:"—" }}</td>
+                  <td>{{ log.workout_duration }} min</td>
+                  <td>{{ log.reps_completed }}</td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="4" class="ha-profile-empty">No workout logs yet.</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card ha-profile-card p-3 mb-3">
+        <h5>User Info</h5>
+        <div class="ha-profile-info-list">
+          <p><strong>Name:</strong> {{ gym_user.user_name }}</p>
+          <p><strong>Username:</strong> @{{ gym_user.user.username }}</p>
+          <p><strong>Age:</strong> {{ gym_user.age|default:"—" }}</p>
+          <p><strong>Gender:</strong> {{ gym_user.gender|default:"—" }}</p>
+          <p><strong>BMI:</strong> {{ bmi|default:"—" }} <span class="badge bg-secondary">{{ bmi_category }}</span></p>
+          <p><strong>Medical condition:</strong> {{ gym_user.medical_condition|default:"None listed" }}</p>
+        </div>
+      </div>
+
+      <div class="card ha-profile-card p-3 mb-3">
+        <h5>Latest Diet Plan</h5>
+        {% with latest_plan=diet_plans.0 %}
+          {% if latest_plan %}
+            <div class="ha-profile-feature-card">
+              <strong>{{ latest_plan.title }}</strong>
+              <span class="badge bg-secondary">{{ latest_plan.get_status_display }}</span>
+              <p>{{ latest_plan.target_goal|default:"No target goal" }}</p>
+              <a class="btn btn-outline-light btn-sm" href="{% url 'health_advisor:diet_plan_detail' latest_plan.pk %}">View Plan</a>
+            </div>
+          {% else %}
+            <p class="ha-profile-empty mb-0">No diet plan assigned yet.</p>
+          {% endif %}
+        {% endwith %}
+      </div>
+
+      <div class="card ha-profile-card p-3">
+        <div class="ha-profile-card-title-row">
+          <h5>Recommendations</h5>
+          <span class="ha-profile-muted">{{ recommendations|length }} shown</span>
+        </div>
+        <div class="ha-profile-timeline-list">
+          {% for rec in recommendations %}
+            <div class="ha-profile-recommendation-row">
+              <div>
                 <span class="badge bg-info text-dark">{{ rec.get_status_display }}</span>
                 <strong>{{ rec.subject }}</strong>
-                <div class="small text-secondary">{{ rec.created_at|date:"d M Y" }}</div>
-                <p class="mb-0">{{ rec.advice|truncatewords:24 }}</p>
+              </div>
+              <p>{{ rec.created_at|date:"d M Y" }} · {{ rec.advice|truncatewords:18 }}</p>
             </div>
-            {% empty %}
-            <p class="text-secondary">No recommendations yet.</p>
-            {% endfor %}
+          {% empty %}
+            <p class="ha-profile-empty mb-0">No recommendations yet.</p>
+          {% endfor %}
         </div>
+      </div>
     </div>
-</div>
-
+  </div>
 {% endblock %}

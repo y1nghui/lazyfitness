@@ -32,7 +32,7 @@ class HealthReportForm(forms.ModelForm):
 class DietPlanForm(forms.ModelForm):
     gym_users = forms.ModelMultipleChoiceField(
         queryset=GymUser.objects.none(),
-        label='Assign to users (optional)',
+        label='Assign to users',
         widget=forms.CheckboxSelectMultiple(),
         required=False,
         help_text='Leave blank to save this diet plan as an unassigned reusable template.',
