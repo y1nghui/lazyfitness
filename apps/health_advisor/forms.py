@@ -1,5 +1,7 @@
 from django import forms
 
+from apps.gym_user.models import GymUser
+
 from .models import DietPlan, HealthReport, Recommendation
 
 
@@ -28,10 +30,18 @@ class HealthReportForm(forms.ModelForm):
 
 
 class DietPlanForm(forms.ModelForm):
+    gym_users = forms.ModelMultipleChoiceField(
+        queryset=GymUser.objects.none(),
+        label='Assign to users (optional)',
+        widget=forms.CheckboxSelectMultiple(),
+        required=False,
+        help_text='Leave blank to save this diet plan as an unassigned reusable template.',
+    )
+
     class Meta:
         model = DietPlan
         fields = [
-            'gym_user',
+            'gym_users',
             'title',
             'description',
             'target_goal',
@@ -50,7 +60,6 @@ class DietPlanForm(forms.ModelForm):
             'end_date': forms.DateInput(attrs={'type': 'date'}),
         }
         labels = {
-            'gym_user': 'Assigned gym user',
             'target_goal': 'Target goal',
             'daily_calorie_target': 'Daily calorie target',
             'restrictions_allergies': 'Restrictions / allergies',
@@ -58,11 +67,13 @@ class DietPlanForm(forms.ModelForm):
 
     def __init__(self, *args, advisor=None, initial_user=None, **kwargs):
         super().__init__(*args, **kwargs)
-        users = advisor.assigned_gym_users.select_related('user').order_by('user_name') if advisor else []
-        self.fields['gym_user'].queryset = users
+        users = advisor.assigned_gym_users.select_related('user').order_by('user_name') if advisor else GymUser.objects.none()
+        self.fields['gym_users'].queryset = users
+        self.fields['gym_users'].label_from_instance = lambda obj: obj.user_name
         if initial_user and not self.is_bound:
-            self.fields['gym_user'].initial = initial_user
+            self.fields['gym_users'].initial = [initial_user.pk]
         apply_plain_ui(self)
+        self.fields['gym_users'].widget.attrs.pop('class', None)
 
     def clean(self):
         cleaned = super().clean()
