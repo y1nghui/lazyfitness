@@ -1,6 +1,5 @@
 {% extends "shared/base.html" %}
 {% block title %}Advisor Dashboard — LazyFitness{% endblock %}
-
 {% block content %}
 <h2 class="section-title">Health Advisor Dashboard</h2>
 <div class="row g-3 mb-4">
@@ -33,7 +32,7 @@
             <td>{% if row.unread_count %}<span class="badge bg-danger">{{ row.unread_count }}</span>{% else %}0{% endif %}</td>
             <td>
               <div class="d-flex flex-wrap gap-2">
-                <a class="btn btn-sm btn-primary" href="{% url 'health_advisor:user_profile' row.gym_user.pk %}">Open</a>
+                <a class="btn btn-sm btn-primary" href="{% url 'health_advisor:user_profile' row.gym_user.pk %}">View</a>
                 <button class="btn btn-sm btn-outline-light" type="button" data-lf-toggle="offcanvas" data-lf-target="#advisorDashboardMessage{{ row.gym_user.pk }}">Message</button>
               </div>
             </td>

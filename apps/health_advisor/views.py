@@ -182,7 +182,6 @@ def diet_plan_list(request):
         'status_choices': DietPlan.STATUS_CHOICES,
     })
 
-
 @health_advisor_required
 def diet_plan_create(request, user_id=None):
     advisor = get_object_or_404(HealthAdvisor, user=request.user)
@@ -218,11 +217,9 @@ def diet_plan_create(request, user_id=None):
         'user_conditions_json': json.dumps(user_conditions),
     })
 
-
 @health_advisor_required
 def diet_plan_update(request, user_id):
     return diet_plan_create(request, user_id=user_id)
-
 
 @health_advisor_required
 def diet_plan_detail(request, plan_id):
@@ -233,7 +230,6 @@ def diet_plan_detail(request, plan_id):
         'plan': plan,
         'assigned_users': list(plan.gym_users.all()),
     })
-
 
 @health_advisor_required
 def diet_plan_edit(request, plan_id):

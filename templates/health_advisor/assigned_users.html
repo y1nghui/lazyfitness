@@ -1,94 +1,120 @@
+
 {% extends "shared/base.html" %}
 {% block title %}Assigned Users — LazyFitness{% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3 btn-toolbar-mobile">
+
+<div class="d-flex justify-content-between align-items-center mb-3">
   <h2 class="section-title mb-0">Assigned Gym Users</h2>
   <a class="btn btn-outline-light" href="{% url 'health_advisor:dashboard' %}">Back to Dashboard</a>
 </div>
+
 <div class="card p-3 mb-3">
   <form method="get" class="row g-2 align-items-end">
-    <div class="col-md-3"><label class="form-label">Search</label>
-      <input class="form-control" name="q" value="{{ search }}">
+    <div class="col-md-3">
+      <label class="form-label" for="q">Search</label>
+      <input id="q" class="form-control" name="q" value="{{ search }}" placeholder="Name or username">
     </div>
-      <div class="col-md-2"><label class="form-label">BMI</label>
-        <select name="bmi" class="form-select"><option value="">All</option>
-          {% for cat in bmi_categories %}
-          <option value="{{ cat }}" {% if bmi_filter == cat %}selected{% endif %}>
-            {{ cat }}
-          </option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="col-md-2"><label class="form-label">Unread</label>
-        <select name="unread" class="form-select"><option value="">Any</option>
-          <option value="yes" {% if unread_filter == 'yes' %}selected{% endif %}>Has unread</option>
-          <option value="no" {% if unread_filter == 'no' %}selected{% endif %}>No unread</option>
-        </select>
-      </div>
-      <div class="col-md-2"><label class="form-label">Diet Plan</label>
-        <select name="report" class="form-select"><option value="">Any</option>
-          <option value="yes" {% if report_filter == 'yes' %}selected{% endif %}>Has plan</option>
-          <option value="no" {% if report_filter == 'no' %}selected{% endif %}>No plan</option>
-        </select></div><div class="col-md-2"><label class="form-label">Recommendation</label>
-          <select name="rec_status" class="form-select">
-          <option value="">Any</option>
-          {% for value,label in recommendation_status_choices %}
-          <option value="{{ value }}" {% if rec_status == value %}selected{% endif %}>{{ label }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="col-md-1"><button class="btn btn-primary w-100">Go</button>
+    <div class="col-md-2">
+      <label class="form-label" for="bmi">BMI</label>
+      <select id="bmi" name="bmi" class="form-select">
+        <option value="">All</option>
+        {% for cat in bmi_categories %}
+        <option value="{{ cat }}" {% if bmi_filter == cat %}selected{% endif %}>{{ cat }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label" for="unread">Unread</label>
+      <select id="unread" name="unread" class="form-select">
+        <option value="">Any</option>
+        <option value="yes" {% if unread_filter == 'yes' %}selected{% endif %}>Has unread</option>
+        <option value="no" {% if unread_filter == 'no' %}selected{% endif %}>No unread</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label" for="report">Diet Plan</label>
+      <select id="report" name="report" class="form-select">
+        <option value="">Any</option>
+        <option value="yes" {% if report_filter == 'yes' %}selected{% endif %}>Has plan</option>
+        <option value="no" {% if report_filter == 'no' %}selected{% endif %}>No plan</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label" for="rec_status">Recommendation</label>
+      <select id="rec_status" name="rec_status" class="form-select">
+        <option value="">Any</option>
+        {% for value,label in recommendation_status_choices %}
+        <option value="{{ value }}" {% if rec_status == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-1">
+      <button class="btn btn-primary w-100">Filter</button>
     </div>
   </form>
 </div>
-<div class="row g-3">
-{% for row in rows %}
-  <div class="col-lg-6">
-    <div class="card p-3 h-100">
-      <div class="d-flex justify-content-between align-items-start">
-        <div class="d-flex gap-2 align-items-center">
-          {% if row.gym_user.user.profile_picture %}
-          <img src="{{ row.gym_user.user.profile_picture.url }}" class="rounded-circle avatar-sm" alt="{{ row.gym_user.user_name }}">
-          {% else %}
-          <span class="avatar-initial-sm">
-            {{ row.gym_user.user.avatar_initial }}
-          </span>
-          {% endif %}
-          <div>
-            <strong>{{ row.gym_user.user_name }}</strong>
-            <div class="small text-secondary">@{{ row.gym_user.user.username }}</div>
-          </div>
-        </div>
-        {% if row.unread_count %}
-        <span class="badge bg-danger">{{ row.unread_count }} unread</span>
-        {% endif %}</div>
-        <div class="row g-2 my-3">
-          <div class="col">
-            <div class="small text-secondary">BMI</div>
-            {{ row.bmi|default:"—" }} 
-            <span class="badge bg-secondary">{{ row.bmi_category }}</span>
-          </div>
-          <div class="col">
-            <div class="small text-secondary">Diet Plan</div>
-            {% if row.latest_diet_plan %}{{ row.latest_diet_plan.title }}
-            {% else %}<span class="text-secondary">None</span>
-            {% endif %}</div>
-            <div class="col">
-              <div class="small text-secondary">Recommendation</div>
-              {% if row.latest_recommendation %}{{ row.latest_recommendation.get_status_display }}
-              {% else %}<span class="text-secondary">None</span>{% endif %}</div>
-            </div>
-            <div class="d-flex flex-wrap gap-2 mt-auto">
-              <a class="btn btn-sm btn-outline-light" href="{% url 'health_advisor:user_profile' row.gym_user.pk %}">View Details</a>
-              <button class="btn btn-sm btn-primary" data-lf-toggle="offcanvas" data-lf-target="#msg{{ row.gym_user.pk }}">Message</button>
-              <button class="btn btn-sm btn-outline-warning" data-lf-toggle="offcanvas" data-lf-target="#rec{{ row.gym_user.pk }}">Recommend</button>
-              <button class="btn btn-sm btn-outline-success" data-lf-toggle="offcanvas" data-lf-target="#diet{{ row.gym_user.pk }}">Diet Plan</button>
-            </div>
-          </div>
-        </div>
-      </div>
+
+<div class="card p-3">
+
+  <div class="assigned-users-list">
+    <div class="assigned-users-header">
+      <div class="small text-secondary text-uppercase">User</div>
+      <div class="small text-secondary text-uppercase">BMI</div>
+      <div class="small text-secondary text-uppercase">Messages Unread</div>
+      <div class="small text-secondary text-uppercase">Diet Plan</div>
+      <div class="small text-secondary text-uppercase">Recommendation</div>
+      <div class="small text-secondary text-uppercase">Actions</div>
     </div>
-  </div>
+
+    {% for row in rows %}
+    <div class="assigned-users-row {% if not forloop.last %}has-border{% endif %}">
+
+    <div class="assigned-users-cell">
+      <div class="fw-semibold small">{{ row.gym_user.user_name }}</div>
+      <div class="small text-secondary">@{{ row.gym_user.user.username }}</div>
+    </div>
+
+    <div class="assigned-users-cell">
+      <span class="small">{{ row.bmi|default:"—" }}</span>
+      <span class="badge bg-secondary ms-1">{{ row.bmi_category }}</span>
+    </div>
+
+    <div class="assigned-users-cell">
+      {% if row.unread_count %}
+      <span class="badge bg-danger">{{ row.unread_count }}</span>
+      {% else %}
+      <span class="small text-secondary">None</span>
+      {% endif %}
+    </div>
+
+    <div class="assigned-users-cell assigned-users-plan">
+      {% if row.latest_diet_plan %}
+      <div class="fw-semibold small">{{ row.latest_diet_plan.title|truncatewords:8 }}</div>
+      {% else %}
+      <div class="small text-secondary">None</div>
+      {% endif %}
+    </div>
+
+    <div class="assigned-users-cell">
+      {% if row.latest_recommendation %}
+      <span class="badge {% if row.latest_recommendation.status == 'completed' %}bg-success{% elif row.latest_recommendation.status == 'cancelled' %}bg-danger{% elif row.latest_recommendation.status == 'read' %}bg-info text-dark{% else %}bg-warning text-dark{% endif %}">
+        {{ row.latest_recommendation.get_status_display }}
+      </span>
+      {% else %}
+      <span class="small text-secondary">None</span>
+      {% endif %}
+    </div>
+
+    <div class="assigned-users-cell assigned-users-actions">
+      <a class="btn btn-sm btn-outline-light" href="{% url 'health_advisor:user_profile' row.gym_user.pk %}">View Details</a>
+      <button class="btn btn-sm btn-primary" data-lf-toggle="offcanvas" data-lf-target="#msg{{ row.gym_user.pk }}">Message</button>
+      <button class="btn btn-sm btn-outline-warning" data-lf-toggle="offcanvas" data-lf-target="#rec{{ row.gym_user.pk }}">Recommend</button>
+      <button class="btn btn-sm btn-outline-success" data-lf-toggle="offcanvas" data-lf-target="#diet{{ row.gym_user.pk }}">Diet Plan</button>
+    </div>
+
+    </div>
+
+  {# Message offcanvas #}
   <div class="offcanvas offcanvas-end" tabindex="-1" id="msg{{ row.gym_user.pk }}">
     <div class="offcanvas-header">
       <h5>Message {{ row.gym_user.user_name }}</h5>
@@ -96,12 +122,9 @@
     </div>
     <div class="offcanvas-body">
       <p class="text-secondary">Send a quick care-team message. Visible to {{ row.gym_user.user_name }}, you, and the assigned coach.</p>
-      <p class="small">Coach: 
-        {% if row.gym_user.assigned_coach %}
-        <strong>{{ row.gym_user.assigned_coach.coach_name }}</strong>
-        {% else %}
-        <span class="text-secondary">Not assigned</span>
-        {% endif %}
+      <p class="small">Coach:
+        {% if row.gym_user.assigned_coach %}<strong>{{ row.gym_user.assigned_coach.coach_name }}</strong>
+        {% else %}<span class="text-secondary">Not assigned</span>{% endif %}
       </p>
       {% if row.recent_messages %}
         <div class="mini-chat mb-3">
@@ -110,9 +133,7 @@
               <div class="chat-bubble small">
                 <strong>{{ msg.sender.display_name }}</strong><br>
                 {% if msg.body %}{{ msg.body|truncatewords:16 }}{% endif %}
-                {% if msg.attachment %}
-                  <div><a href="{{ msg.attachment.url }}" target="_blank">Attachment</a></div>
-                {% endif %}
+                {% if msg.attachment %}<div><a href="{{ msg.attachment.url }}" target="_blank">Attachment</a></div>{% endif %}
                 <div class="text-secondary">{{ msg.created_at|date:"d M H:i" }}</div>
               </div>
             </div>
@@ -187,13 +208,15 @@
       {% else %}
         <div class="empty-state mb-3">No diet plan yet for this user.</div>
       {% endif %}
-      <a class="btn btn-success w-100" href="{% url 'health_advisor:diet_plan_update' row.gym_user.pk %}?next={{ request.get_full_path|urlencode }}">
-        Create New Diet Plan
-      </a>
+      <a class="btn btn-success w-100" href="{% url 'health_advisor:diet_plan_update' row.gym_user.pk %}?next={{ request.get_full_path|urlencode }}">Create New Diet Plan</a>
     </div>
   </div>
 
+    {% empty %}
+    <div class="p-4 text-secondary text-center">No assigned users found.</div>
+    {% endfor %}
+  </div>
 </div>
-{% endfor %}
+
 {% include 'shared/pagination.html' %}
 {% endblock %}
