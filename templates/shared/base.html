@@ -38,6 +38,7 @@
             <li class="nav-item dropdown profile-hover-dropdown">
               <a class="nav-link dropdown-toggle" href="#" data-lf-toggle="dropdown" role="button" aria-expanded="false">My Fitness</a>
               <ul class="dropdown-menu dropdown-menu-dark profile-centered-menu">
+                <li><a class="dropdown-item" href="{% url 'gym_user:goal_list' %}">Goals</a></li>
                 <li><a class="dropdown-item" href="{% url 'gym_user:workout_select' %}">Workouts</a></li>
                 <li><a class="dropdown-item" href="{% url 'gym_user:schedule' %}">Schedule</a></li>
                 <li><a class="dropdown-item" href="{% url 'gym_user:progress' %}">Progress</a></li>
