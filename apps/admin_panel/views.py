@@ -319,19 +319,36 @@ def system_log_list(request):
     search = request.GET.get('q', '').strip()
     start = request.GET.get('start', '')
     end = request.GET.get('end', '')
+
     if event_filter:
         logs = logs.filter(event=event_filter)
     if module_filter:
         logs = logs.filter(module__icontains=module_filter)
     if search:
-        logs = logs.filter(description__icontains=search)
+        # Expand the search to check the description OR the username/email of the actor
+        logs = logs.filter(
+            Q(description__icontains=search) |
+            Q(performed_by__username__icontains=search) |
+            Q(performed_by__email__icontains=search)
+        )
     if parse_date(start):
         logs = logs.filter(timestamp__date__gte=parse_date(start))
     if parse_date(end):
         logs = logs.filter(timestamp__date__lte=parse_date(end))
+        
     page_obj, page_query = paginate(request, logs, per_page=20)
-    return render(request, 'admin_panel/system_log_list.html', {'logs': page_obj.object_list, 'page_obj': page_obj, 'page_query': page_query, 'event_choices': SystemLog.EVENT_CHOICES, 'event_filter': event_filter, 'module_filter': module_filter, 'search': search, 'start': start, 'end': end})
-
+    
+    return render(request, 'admin_panel/system_log_list.html', {
+        'logs': page_obj.object_list, 
+        'page_obj': page_obj, 
+        'page_query': page_query, 
+        'event_choices': SystemLog.EVENT_CHOICES, 
+        'event_filter': event_filter, 
+        'module_filter': module_filter, 
+        'search': search, 
+        'start': start, 
+        'end': end
+    })
 
 @admin_required
 def system_log_detail(request, log_id):

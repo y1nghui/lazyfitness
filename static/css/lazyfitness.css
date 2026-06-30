@@ -1157,20 +1157,35 @@ textarea:focus {
 
   .navbar-collapse {
     display: none;
-    flex: 0 0 100% !important; 
-    width: 100% !important;
-    margin-top: 1rem;
-    order: 3; 
+    position: fixed !important;
+    top: 68px !important; /* Accounts for 66px min-height + 2px border */
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: calc(100vh - 68px) !important;
+    background: rgba(30, 30, 30, 0.98) !important;
+    backdrop-filter: blur(14px);
+    z-index: 1040;
+    margin-top: 0 !important;
+    padding: 2rem 1rem !important;
+    overflow-y: auto;
   }
 
   .navbar-collapse.show {
-    display: block !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
 
   .navbar-nav {
     display: flex;
-    flex-direction: column; 
-    align-items: stretch;
+    flex-direction: column;
+    align-items: stretch; /* Keeps button widths and text alignment identical */
+    width: 100%;
+    max-width: 280px; /* Adjust this value to widen/narrow the centered block */
+    margin: 0 auto;
     padding: 0 0 1rem 0;
     gap: 0.5rem;
   }
@@ -1187,11 +1202,12 @@ textarea:focus {
     position: relative !important; /* Acts as the anchor for the dropdowns */
     flex-direction: row !important;
     align-items: center !important;
-    justify-content: flex-start !important;
+    justify-content: center !important; 
     gap: 1.5rem !important;
     width: 100%;
-    padding: 1rem 0.5rem !important;
-    margin-top: 0.5rem;
+    max-width: 280px;
+    padding: 1.5rem 0.5rem 1rem !important;
+    margin: 0 auto !important;
     border-top: 1px solid var(--lf-border);
   }
 
@@ -1625,7 +1641,6 @@ a.footer-link:focus {
   }
 }
 
-/* Navbar one-line desktop alignment fix */
 .nav-container {
   flex-wrap: nowrap;
 }
@@ -1669,23 +1684,169 @@ a.footer-link:focus {
   }
 
   #nav .nav-actions {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    flex: 0 0 auto;
-    white-space: nowrap;
-    padding-left: .75rem;
+    display: flex !important;
+    position: relative !important;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+    width: 100% !important;
+    max-width: 280px !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    background: transparent !important;
   }
 
   #nav .nav-actions .nav-link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding-top: .5rem;
-    padding-bottom: .5rem;
+    width: 100%;
+    justify-content: flex-start !important; 
+    text-align: left !important;
+    padding: 0.75rem 1rem !important;
+    border-radius: 10px;
+    font-size: 1rem;
+    background: transparent !important; 
+    border: 1px solid transparent !important;
+    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
   }
 
   #nav .profile-hover-dropdown .dropdown-toggle {
     white-space: nowrap;
+  }
+}
+
+/* ============================================================
+   Mobile hamburger nav: two-layer submenu
+   Replaces the old inline dropdown (which pushed items below it
+   down the page) with a full-screen "layer 2" panel that covers
+   the menu, plus a "<" button to return to the top-level list.
+   Desktop (>=992px) hover/click dropdowns are unaffected.
+   ============================================================ */
+
+.lf-submenu-back,
+.lf-submenu-title {
+  display: none;
+}
+
+@media (max-width: 991.98px) {
+  /* Swap the desktop "▾" caret for a "›" chevron on nav items that
+     open a submenu, signalling that a new layer/page will open */
+  #nav .navbar-nav .nav-item.dropdown > .dropdown-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  #nav .navbar-nav .nav-item.dropdown > .dropdown-toggle::after {
+    content: "\203A";
+    margin-left: .5rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    opacity: .85;
+  }
+
+  #nav .nav-actions .nav-item.dropdown > .dropdown-toggle::after {
+    margin-left: .3rem;
+  }
+
+  /* Layer 1 (the normal list): submenus stay closed until tapped */
+  #nav .navbar-nav .nav-item.dropdown .dropdown-menu {
+    display: none;
+  }
+
+  /* Layer 2: only the active item's submenu is visible */
+  #nav.lf-submenu-open .navbar-nav > .nav-item:not(.lf-active-submenu) {
+    display: none !important;
+  }
+
+  #nav.lf-submenu-open .lf-active-submenu > .nav-link {
+    display: none !important;
+  }
+
+  #nav.lf-submenu-open .nav-actions {
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  #nav.lf-submenu-open .lf-active-submenu .dropdown-menu {
+    display: flex !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+    width: 100% !important;
+    max-width: 280px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  #nav.lf-submenu-open .lf-active-submenu .dropdown-item {
+    width: 100%;
+    justify-content: flex-start !important; 
+    text-align: left !important;
+    padding: 0.75rem 1rem !important;
+    border-radius: 10px;
+    font-size: 1rem;
+    background: transparent !important; 
+    border: 1px solid transparent !important;
+    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+  }
+
+  #nav.lf-submenu-open .lf-active-submenu .dropdown-item:hover {
+    background: rgba(224, 58, 32, 0.08) !important;
+    border-color: rgba(224, 58, 32, 0.2) !important;
+    color: var(--lf-accent) !important;
+  }
+
+  #nav.lf-submenu-open .lf-active-submenu hr {
+    display: none !important;
+  }
+
+  /* Shared back button + heading, shown only while layer 2 is open */
+  #nav.lf-submenu-open .lf-submenu-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    position: absolute;
+    top: 1.5rem; 
+    left: 1.5rem;
+    z-index: 1110;
+    padding: 0.5rem 0.85rem;
+    border: 1px solid var(--lf-border);
+    border-radius: 10px;
+    background: var(--lf-surface);
+    color: var(--lf-text);
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+
+  #nav.lf-submenu-open .lf-submenu-back:hover {
+    color: var(--lf-accent);
+    border-color: var(--lf-accent);
+  }
+
+  #nav.lf-submenu-open .lf-submenu-back-arrow {
+    font-size: 1.2rem;
+    line-height: 1;
+  }
+
+  #nav.lf-submenu-open .lf-submenu-title {
+    display: block;
+    position: absolute;
+    top: 1.9rem;
+    left: 0;
+    right: 0;
+    z-index: 1105;
+    text-align: center;
+    font-weight: 800;
+    font-size: 1.05rem;
+    color: var(--lf-text);
+    pointer-events: none;
   }
 }

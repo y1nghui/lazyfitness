@@ -45,6 +45,15 @@
     if (trigger) {
       trigger.setAttribute('aria-expanded', String(isOpen));
     }
+    if (element.id === 'nav') {
+      // Lock body scrolling when the full-screen mobile nav is open
+      if (isOpen && window.matchMedia('(max-width: 991.98px)').matches) {
+        document.body.classList.add('lf-overlay-open');
+      } else {
+        document.body.classList.remove('lf-overlay-open');
+        closeMobileSubmenu();
+      }
+    }
   }
 
   function toggleDropdown(trigger) {
@@ -59,7 +68,66 @@
     trigger.setAttribute('aria-expanded', String(!isOpen));
   }
 
+  // --- Mobile hamburger nav: two-layer submenu ("layer 2 page") ---
+  // Below the lg breakpoint, tapping a nav item that has a submenu no longer
+  // expands an inline list (which pushed everything below it down). Instead
+  // it swaps the whole mobile nav panel for a full-screen layer showing just
+  // that submenu, vertically centered, with a "<" button to go back.
+
+  function isMobileNavView() {
+    return window.matchMedia('(max-width: 991.98px)').matches;
+  }
+
+  function closeMobileSubmenu() {
+    const nav = document.getElementById('nav');
+    if (!nav) {
+      return;
+    }
+    nav.classList.remove('lf-submenu-open');
+    nav.querySelectorAll('.nav-item.lf-active-submenu').forEach((item) => {
+      item.classList.remove('lf-active-submenu');
+      const menu = item.querySelector('.dropdown-menu');
+      if (menu) {
+        menu.classList.remove('show');
+      }
+      const trigger = item.querySelector(':scope > .dropdown-toggle');
+      if (trigger) {
+        trigger.setAttribute('aria-expanded', 'false');
+      }
+    });
+    const title = document.getElementById('navSubmenuTitle');
+    if (title) {
+      title.textContent = '';
+    }
+    document.body.classList.remove('lf-overlay-open');
+  }
+
+  function openMobileSubmenu(navItem, trigger) {
+    const nav = document.getElementById('nav');
+    const menu = navItem.querySelector('.dropdown-menu');
+    if (!nav || !menu) {
+      return;
+    }
+    closeMobileSubmenu();
+    navItem.classList.add('lf-active-submenu');
+    menu.classList.add('show');
+    nav.classList.add('lf-submenu-open');
+    trigger.setAttribute('aria-expanded', 'true');
+    const title = document.getElementById('navSubmenuTitle');
+    if (title) {
+      title.textContent = trigger.dataset.submenuTitle || trigger.textContent.trim();
+    }
+    document.body.classList.add('lf-overlay-open');
+  }
+
   document.addEventListener('click', (event) => {
+    const submenuBack = event.target.closest('.lf-submenu-back');
+    if (submenuBack) {
+      event.preventDefault();
+      closeMobileSubmenu();
+      return;
+    }
+
     const toggle = event.target.closest('[data-lf-toggle]');
     if (toggle) {
       const action = toggle.dataset.lfToggle;
@@ -67,7 +135,12 @@
 
       if (action === 'dropdown') {
         event.preventDefault();
-        toggleDropdown(toggle);
+        const navItem = toggle.closest('#nav .nav-item.dropdown');
+        if (navItem && isMobileNavView()) {
+          openMobileSubmenu(navItem, toggle);
+        } else {
+          toggleDropdown(toggle);
+        }
         return;
       }
 
@@ -115,6 +188,13 @@
       closeOverlays('.modal.show');
       closeOverlays('.offcanvas.show');
       document.querySelectorAll('.dropdown-menu.show').forEach((item) => item.classList.remove('show'));
+      closeMobileSubmenu();
+    }
+  });
+
+  window.addEventListener('resize', () => {
+    if (!isMobileNavView()) {
+      closeMobileSubmenu();
     }
   });
 

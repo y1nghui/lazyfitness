@@ -30,13 +30,17 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="navbar-collapse collapse" id="nav">
+      <button type="button" class="lf-submenu-back" id="navSubmenuBack" aria-label="Back to menu">
+        <span class="lf-submenu-back-arrow" aria-hidden="true">&lsaquo;</span> Back
+      </button>
+      <div class="lf-submenu-title" id="navSubmenuTitle" aria-hidden="true"></div>
       {% if user.is_authenticated %}
         
         <ul class="navbar-nav main-nav mx-auto align-items-lg-center justify-content-lg-center flex-grow-1 gap-lg-4 px-lg-3 flex-nowrap">
           {% if user.is_gym_user %}
             <li class="nav-item"><a class="nav-link" href="{% url 'gym_user:dashboard' %}">Dashboard</a></li>
             <li class="nav-item dropdown profile-hover-dropdown">
-              <a class="nav-link dropdown-toggle" href="#" data-lf-toggle="dropdown" role="button" aria-expanded="false">My Fitness</a>
+              <a class="nav-link dropdown-toggle" href="#" data-lf-toggle="dropdown" data-submenu-title="My Fitness" role="button" aria-expanded="false">My Fitness</a>
               <ul class="dropdown-menu dropdown-menu-dark profile-centered-menu">
                 <li><a class="dropdown-item" href="{% url 'gym_user:workout_select' %}">Workouts</a></li>
                 <li><a class="dropdown-item" href="{% url 'gym_user:schedule' %}">Schedule</a></li>
@@ -50,7 +54,7 @@
           {% elif user.is_coach %}
             <li class="nav-item"><a class="nav-link" href="{% url 'coach:dashboard' %}">Dashboard</a></li>
             <li class="nav-item dropdown profile-hover-dropdown">
-              <a class="nav-link dropdown-toggle" href="#" data-lf-toggle="dropdown" role="button" aria-expanded="false">Coaching</a>
+              <a class="nav-link dropdown-toggle" href="#" data-lf-toggle="dropdown" data-submenu-title="Coaching" role="button" aria-expanded="false">Coaching</a>
               <ul class="dropdown-menu dropdown-menu-dark profile-centered-menu">
                 <li><a class="dropdown-item" href="{% url 'coach:assigned_users' %}">Assigned Users</a></li>
                 <li><a class="dropdown-item" href="{% url 'coach:plan_list' %}">Plans</a></li>
@@ -63,7 +67,7 @@
           {% elif user.is_health_advisor %}
             <li class="nav-item"><a class="nav-link" href="{% url 'health_advisor:dashboard' %}">Dashboard</a></li>
             <li class="nav-item dropdown profile-hover-dropdown">
-              <a class="nav-link dropdown-toggle" href="#" data-lf-toggle="dropdown" role="button" aria-expanded="false">Advisory</a>
+              <a class="nav-link dropdown-toggle" href="#" data-lf-toggle="dropdown" data-submenu-title="Advisory" role="button" aria-expanded="false">Advisory</a>
               <ul class="dropdown-menu dropdown-menu-dark profile-centered-menu">
                 <li><a class="dropdown-item" href="{% url 'health_advisor:assigned_users' %}">Assigned Users</a></li>
                 <li><a class="dropdown-item" href="{% url 'health_advisor:diet_plan_list' %}">Diet Plans</a></li>
@@ -76,7 +80,7 @@
             <li class="nav-item"><a class="nav-link" href="{% url 'admin_panel:dashboard' %}">Dashboard</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'admin_panel:user_list' %}">Users</a></li>
             <li class="nav-item dropdown profile-hover-dropdown">
-              <a class="nav-link dropdown-toggle" href="#" data-lf-toggle="dropdown" role="button" aria-expanded="false">Logs</a>
+              <a class="nav-link dropdown-toggle" href="#" data-lf-toggle="dropdown" data-submenu-title="Logs" role="button" aria-expanded="false">Logs</a>
               <ul class="dropdown-menu dropdown-menu-dark profile-centered-menu">
                 <li><a class="dropdown-item" href="{% url 'admin_panel:login_activity_list' %}">User Activity</a></li>
                 <li><a class="dropdown-item" href="{% url 'admin_panel:system_log_list' %}">System Logs</a></li>
@@ -108,7 +112,7 @@
 
           {% if user.is_admin_user %}
             <li class="nav-item dropdown profile-hover-dropdown ms-2">
-              <a class="nav-link nav-icon-link dropdown-toggle" href="#" data-lf-toggle="dropdown" role="button" aria-expanded="false" aria-label="Exports">
+              <a class="nav-link nav-icon-link dropdown-toggle" href="#" data-lf-toggle="dropdown" data-submenu-title="Exports" role="button" aria-expanded="false" aria-label="Exports">
                 <div class="icon-wrapper">
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -135,7 +139,7 @@
           </li>
 
           <li class="nav-item dropdown profile-hover-dropdown ms-1 flex-shrink-0">
-            <a class="nav-link d-flex align-items-center gap-2 dropdown-toggle" href="#" role="button" data-lf-toggle="dropdown" aria-expanded="false">
+            <a class="nav-link d-flex align-items-center gap-2 dropdown-toggle" href="#" role="button" data-lf-toggle="dropdown" data-submenu-title="Account" aria-expanded="false" aria-label="Account">
               {% if user.profile_picture %}
                 <img src="{{ user.profile_picture.url }}" alt="{{ user.username }} profile picture" class="rounded-circle avatar-sm">
               {% else %}
@@ -155,11 +159,12 @@
         </ul>
 
       {% else %}
-        <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
+        <ul class="navbar-nav ms-auto align-items-lg-center gap-2 gap-lg-3">
           <li class="nav-item"><a class="nav-link" href="{% url 'faq_public' %}">FAQ</a></li>
-        <ul class="navbar-nav nav-actions ms-lg-auto align-items-lg-center gap-lg-3">
           <li class="nav-item"><a class="nav-link" href="{% url 'accounts:login' %}">Login</a></li>
-          <li class="nav-item"><a class="btn btn-primary btn-sm" href="{% url 'accounts:register' %}">Start Your Fitness Journey</a></li>
+          <li class="nav-item mt-2 mt-lg-0">
+            <a class="btn btn-primary w-100 d-flex justify-content-center" href="{% url 'accounts:register' %}">Start Your Fitness Journey</a>
+          </li>
         </ul>
       {% endif %}
     </div>
