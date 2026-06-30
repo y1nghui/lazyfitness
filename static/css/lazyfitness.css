@@ -1850,3 +1850,832 @@ a.footer-link:focus {
     pointer-events: none;
   }
 }
+
+
+/* ==========================================================
+   Template-specific feature styles moved from inline CSS
+   ========================================================== */
+
+/* Health Advisor assigned users list */
+.assigned-users-list {
+  width: 100%;
+  overflow: hidden;
+}
+
+.assigned-users-header,
+.assigned-users-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) minmax(90px, 0.65fr) minmax(80px, 0.6fr) minmax(190px, 1.45fr) minmax(120px, 0.9fr) minmax(210px, 1.6fr);
+  column-gap: 12px;
+  align-items: center;
+  width: 100%;
+}
+
+.assigned-users-header {
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.assigned-users-row {
+  padding: 1rem;
+}
+
+.assigned-users-row.has-border {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.assigned-users-cell {
+  min-width: 0;
+}
+
+.assigned-users-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  justify-content: flex-start;
+  min-width: 0;
+}
+
+.assigned-users-actions .btn {
+  white-space: nowrap;
+  padding-left: 0.65rem;
+  padding-right: 0.65rem;
+}
+
+.assigned-users-plan {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+@media (max-width: 992px) {
+  .assigned-users-header {
+    display: none;
+  }
+
+  .assigned-users-row {
+    grid-template-columns: 1fr;
+    row-gap: 0.75rem;
+  }
+
+  .assigned-users-cell::before {
+    display: block;
+    margin-bottom: 0.2rem;
+    color: var(--lf-muted, #a4a4a4);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+  }
+
+  .assigned-users-cell:nth-child(1)::before { content: "User"; }
+  .assigned-users-cell:nth-child(2)::before { content: "BMI"; }
+  .assigned-users-cell:nth-child(3)::before { content: "Unread"; }
+  .assigned-users-cell:nth-child(4)::before { content: "Diet Plan"; }
+  .assigned-users-cell:nth-child(5)::before { content: "Recommendation"; }
+  .assigned-users-cell:nth-child(6)::before { content: "Actions"; }
+}
+
+/* Health Advisor diet plan user multiselect dropdown */
+.lf-multiselect {
+  position: relative;
+}
+
+.lf-multiselect-toggle {
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 0.65rem;
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  text-align: left;
+  cursor: pointer;
+}
+
+.lf-multiselect-toggle::after {
+  content: "▾";
+  color: #cccccc;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.lf-multiselect.open .lf-multiselect-toggle::after {
+  content: "▴";
+}
+
+.lf-multiselect-menu {
+  display: none;
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 0.35rem);
+  left: 0;
+  right: 0;
+  max-height: 230px;
+  overflow-y: auto;
+  padding: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 0.65rem;
+  background: #1f1f1f;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+}
+
+.lf-multiselect.open .lf-multiselect-menu {
+  display: block;
+}
+
+.lf-multiselect-option {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.45rem 0.5rem;
+  border-radius: 0.45rem;
+  color: #f5f5f5;
+  cursor: pointer;
+}
+
+.lf-multiselect-option:hover {
+  background: rgba(255, 61, 36, 0.16);
+}
+
+.lf-multiselect-empty {
+  padding: 0.5rem;
+  color: #999999;
+  font-size: 0.9rem;
+}
+
+/* Health Advisor selected user profile redesign */
+.ha-user-profile-page {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+  padding-bottom: 2rem;
+}
+
+.ha-user-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding: 1.35rem;
+  margin-bottom: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 8% 0%, rgba(224, 58, 32, 0.24), transparent 32%),
+    linear-gradient(135deg, rgba(37, 37, 37, 0.98), rgba(17, 17, 17, 0.98));
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.28);
+}
+
+.ha-user-identity {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.ha-user-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 76px;
+  height: 76px;
+  flex: 0 0 76px;
+  border: 2px solid rgba(224, 58, 32, 0.85);
+  border-radius: 24px;
+  background: linear-gradient(135deg, rgba(224, 58, 32, 0.26), rgba(224, 58, 32, 0.06));
+  color: #ffffff;
+  font-size: 1.7rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  box-shadow: inset 0 0 20px rgba(224, 58, 32, 0.08);
+}
+
+.ha-user-title-block {
+  min-width: 0;
+}
+
+.ha-user-title-block h1 {
+  margin: 0.15rem 0 0.25rem;
+  color: #ffffff;
+  font-size: clamp(1.7rem, 3vw, 2.45rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.ha-user-title-block p {
+  margin: 0;
+  color: var(--lf-muted, #a4a4a4);
+  font-size: 0.98rem;
+}
+
+.ha-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #ff7a66;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ha-user-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  flex: 0 0 auto;
+}
+
+.ha-user-actions .btn {
+  min-width: 108px;
+  justify-content: center;
+}
+
+.ha-profile-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.ha-kpi-card {
+  min-height: 116px;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(31, 31, 31, 0.98), rgba(20, 20, 20, 0.98));
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+}
+
+.ha-kpi-label {
+  display: block;
+  margin-bottom: 0.45rem;
+  color: var(--lf-muted, #a4a4a4);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.ha-kpi-card strong {
+  display: inline-block;
+  color: #ffffff;
+  font-size: clamp(1.15rem, 2vw, 1.55rem);
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.ha-kpi-card > span:not(.ha-kpi-label):not(.badge) {
+  color: var(--lf-muted, #a4a4a4);
+  font-weight: 700;
+}
+
+.ha-kpi-text {
+  max-width: 100%;
+  font-size: 1.02rem !important;
+  line-height: 1.35 !important;
+  word-break: break-word;
+}
+
+.ha-profile-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.92fr) minmax(0, 1.48fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.ha-profile-panel {
+  padding: 1.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(31, 31, 31, 0.98), rgba(16, 16, 16, 0.98));
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.22);
+}
+
+.ha-profile-panel-large,
+.ha-profile-panel-wide {
+  min-width: 0;
+}
+
+.ha-profile-panel-wide {
+  grid-column: 1 / -1;
+}
+
+.ha-panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.95rem;
+}
+
+.ha-panel-header h2 {
+  margin: 0.15rem 0 0;
+  color: #ffffff;
+  font-size: 1.06rem;
+  font-weight: 900;
+}
+
+.ha-panel-note {
+  color: var(--lf-muted, #a4a4a4);
+  font-size: 0.86rem;
+  white-space: nowrap;
+}
+
+.ha-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.ha-metric-box {
+  min-height: 104px;
+  padding: 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.ha-metric-box span,
+.ha-metric-box small {
+  display: block;
+  color: var(--lf-muted, #a4a4a4);
+  font-weight: 700;
+}
+
+.ha-metric-box span {
+  margin-bottom: 0.45rem;
+  font-size: 0.82rem;
+}
+
+.ha-metric-box strong {
+  display: block;
+  color: #ffffff;
+  font-size: 1.35rem;
+  line-height: 1.15;
+}
+
+.ha-clean-list,
+.ha-recommendation-list {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.ha-clean-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.9rem;
+  padding: 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.ha-clean-list-item strong {
+  display: block;
+  color: #ffffff;
+  font-size: 0.96rem;
+  line-height: 1.35;
+}
+
+.ha-clean-list-item span,
+.ha-rec-date {
+  display: block;
+  margin-top: 0.2rem;
+  color: var(--lf-muted, #a4a4a4);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.ha-plan-row {
+  align-items: flex-start;
+}
+
+.ha-table-card {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.ha-modern-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: #ffffff;
+}
+
+.ha-modern-table th,
+.ha-modern-table td {
+  padding: 0.82rem 0.9rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.ha-modern-table th {
+  color: #d7d7d7;
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.ha-modern-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.ha-empty-cell,
+.ha-empty-state {
+  color: var(--lf-muted, #a4a4a4);
+}
+
+.ha-empty-state {
+  padding: 0.9rem;
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.ha-recommendation-card {
+  padding: 0.95rem;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.ha-recommendation-top {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.2rem;
+}
+
+.ha-recommendation-top strong {
+  color: #ffffff;
+  font-size: 1rem;
+}
+
+.ha-recommendation-card p {
+  margin: 0.55rem 0 0;
+  color: #dddddd;
+  line-height: 1.55;
+}
+
+@media (max-width: 992px) {
+  .ha-user-hero {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .ha-user-actions {
+    justify-content: flex-start;
+  }
+
+  .ha-profile-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ha-profile-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ha-profile-panel-wide {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .ha-user-hero,
+  .ha-profile-panel,
+  .ha-kpi-card {
+    border-radius: 16px;
+  }
+
+  .ha-user-identity {
+    align-items: flex-start;
+  }
+
+  .ha-user-avatar {
+    width: 58px;
+    height: 58px;
+    flex-basis: 58px;
+    border-radius: 18px;
+    font-size: 1.35rem;
+  }
+
+  .ha-user-actions,
+  .ha-user-actions .btn {
+    width: 100%;
+  }
+
+  .ha-profile-kpis,
+  .ha-metric-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ha-clean-list-item {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+/* Health Advisor user profile - diet detail style layout */
+.ha-profile-detail-page {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+  padding-bottom: 2rem;
+}
+
+.ha-profile-detail-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.ha-profile-detail-title {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.ha-profile-mini-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  flex: 0 0 54px;
+  border: 2px solid rgba(224, 58, 32, 0.9);
+  border-radius: 16px;
+  background: rgba(224, 58, 32, 0.12);
+  color: #ffffff;
+  font-size: 1.35rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.ha-profile-subtitle {
+  margin: 0 0 0.25rem;
+  color: var(--lf-muted);
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.ha-profile-muted {
+  color: var(--lf-muted) !important;
+  font-size: 0.92rem;
+}
+
+.ha-profile-detail-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.ha-profile-detail-actions .btn {
+  min-width: 112px;
+  justify-content: center;
+}
+
+.ha-profile-summary-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.ha-profile-summary-item {
+  min-height: 98px;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(31, 31, 31, 0.98), rgba(17, 17, 17, 0.98));
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.2);
+}
+
+.ha-profile-summary-item span:first-child {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--lf-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.ha-profile-summary-item strong {
+  display: inline-block;
+  margin-right: 0.35rem;
+  color: #ffffff;
+  font-size: 1.32rem;
+  line-height: 1.25;
+}
+
+.ha-profile-card {
+  border-color: rgba(255, 255, 255, 0.09) !important;
+  border-radius: 16px !important;
+  background: linear-gradient(180deg, rgba(30, 30, 30, 0.98), rgba(18, 18, 18, 0.98)) !important;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.22);
+}
+
+.ha-profile-card h5 {
+  margin-bottom: 1rem;
+  color: #ffffff;
+  font-weight: 900;
+}
+
+.ha-profile-card-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.ha-profile-card-title-row h5 {
+  margin-bottom: 0;
+}
+
+.ha-profile-metric-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.ha-profile-metric-list > div {
+  min-height: 96px;
+  padding: 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.ha-profile-metric-list span:first-child {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: var(--lf-muted);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.ha-profile-metric-list strong {
+  display: block;
+  color: #ffffff;
+  font-size: 1.18rem;
+}
+
+.ha-profile-info-list p {
+  margin-bottom: 0.85rem;
+  color: #dddddd;
+  line-height: 1.55;
+}
+
+.ha-profile-info-list p:last-child {
+  margin-bottom: 0;
+}
+
+.ha-profile-timeline-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.ha-profile-list-row,
+.ha-profile-recommendation-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ha-profile-list-row:last-child,
+.ha-profile-recommendation-row:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.ha-profile-list-row strong,
+.ha-profile-recommendation-row strong {
+  color: #ffffff;
+}
+
+.ha-profile-list-row p,
+.ha-profile-recommendation-row p,
+.ha-profile-feature-card p {
+  margin: 0.25rem 0 0;
+  color: #d0d0d0;
+  line-height: 1.55;
+}
+
+.ha-profile-list-row > span:not(.badge) {
+  color: var(--lf-muted);
+  white-space: nowrap;
+}
+
+.ha-profile-feature-card {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.ha-profile-feature-card .badge {
+  width: fit-content;
+}
+
+.ha-profile-table-wrap {
+  overflow-x: auto;
+}
+
+.ha-profile-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: #ffffff;
+}
+
+.ha-profile-table th,
+.ha-profile-table td {
+  padding: 0.8rem 0.7rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.ha-profile-table th {
+  color: #d8d8d8;
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.ha-profile-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.ha-profile-empty {
+  color: var(--lf-muted) !important;
+}
+
+@media (max-width: 992px) {
+  .ha-profile-detail-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .ha-profile-detail-actions {
+    justify-content: flex-start;
+  }
+
+  .ha-profile-summary-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ha-profile-metric-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .ha-profile-detail-title {
+    align-items: flex-start;
+  }
+
+  .ha-profile-mini-avatar {
+    width: 46px;
+    height: 46px;
+    flex-basis: 46px;
+    border-radius: 14px;
+    font-size: 1.15rem;
+  }
+
+  .ha-profile-detail-actions,
+  .ha-profile-detail-actions .btn {
+    width: 100%;
+  }
+
+  .ha-profile-summary-strip,
+  .ha-profile-metric-list {
+    grid-template-columns: 1fr;
+  }
+
+  .ha-profile-card-title-row,
+  .ha-profile-list-row,
+  .ha-profile-recommendation-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

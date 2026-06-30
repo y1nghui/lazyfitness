@@ -3,6 +3,8 @@ import json
 from datetime import timedelta
 
 from django.contrib import messages
+from django.core.exceptions import FieldDoesNotExist
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -11,7 +13,7 @@ from django.views.decorators.http import require_POST
 from apps.accounts.decorators import gym_user_required
 from apps.accounts.signals import ensure_role_profile
 from apps.coach.models import AssignedWorkoutPlan, WorkoutPlan
-from apps.health_advisor.models import Recommendation
+from apps.health_advisor.models import DietPlan, Recommendation
 from lazyfitness.view_helpers import safe_back_url, safe_next_url
 
 from .forms import (
@@ -107,6 +109,137 @@ def _week_calendar(gym_user):
         })
     return week_days
 
+
+def _model_has_field(model, field_name):
+    try:
+        model._meta.get_field(field_name)
+    except FieldDoesNotExist:
+        return False
+    return True
+
+
+def _as_date(value):
+    if not value:
+        return None
+    if hasattr(value, 'date'):
+        return value.date()
+    return value
+
+
+def _date_text(value):
+    date_value = _as_date(value)
+    return date_value.isoformat() if date_value else 'Not set'
+
+
+def _fullcalendar_end_date(start_date, end_date):
+    if not end_date:
+        return None
+    if start_date and end_date < start_date:
+        return None
+    return (end_date + timedelta(days=1)).isoformat()
+
+
+def _event_details(*lines):
+    return '\n'.join(str(line) for line in lines if line not in [None, ''])
+
+
+def _assigned_diet_plans_for_user(gym_user):
+    queryset = DietPlan.objects.select_related('advisor')
+    if _model_has_field(DietPlan, 'gym_users'):
+        return queryset.filter(gym_users=gym_user).distinct()
+    if _model_has_field(DietPlan, 'gym_user'):
+        return queryset.filter(gym_user=gym_user)
+    return queryset.none()
+
+
+def _diet_plan_events(gym_user):
+    events = []
+    for plan in _assigned_diet_plans_for_user(gym_user):
+        start_date = plan.start_date or plan.end_date or _as_date(getattr(plan, 'created_at', None))
+        if not start_date:
+            continue
+        end_date = plan.end_date if plan.start_date else None
+        details = _event_details(
+            'Plan type: Diet Plan',
+            f'Title: {plan.title}',
+            f'Health advisor: {plan.advisor.advisor_name if plan.advisor_id else "Not assigned"}',
+            f'Status: {plan.get_status_display()}',
+            f'Target goal: {plan.target_goal or "Not set"}',
+            f'Daily calorie target: {plan.daily_calorie_target or "Not set"}',
+            f'Start date: {_date_text(plan.start_date)}',
+            f'End date: {_date_text(plan.end_date)}',
+            f'Description: {plan.description or "No description provided"}',
+            f'Meal details: {plan.meal_notes or "No meal details provided"}',
+            f'Restrictions/allergies: {plan.restrictions_allergies or "None stated"}',
+        )
+        event = {
+            'title': f'Diet Plan: {plan.title}',
+            'start': start_date.isoformat(),
+            'extendedProps': {'details': details},
+        }
+        end_value = _fullcalendar_end_date(start_date, end_date)
+        if end_value:
+            event['end'] = end_value
+        events.append(event)
+    return events
+
+
+def _workout_summary(plan):
+    workouts = []
+    for workout in plan.workouts.all():
+        exercises = [
+            f'{exercise.exercise_name} ({exercise.sets} sets x {exercise.exercise_reps} reps)'
+            for exercise in workout.exercises.all()
+        ]
+        if exercises:
+            workouts.append(f'{workout.workout_name}: ' + '; '.join(exercises))
+        else:
+            workouts.append(workout.workout_name)
+    return '\n'.join(workouts) if workouts else 'No workout details provided'
+
+
+def _workout_plan_events(gym_user):
+    assignments = AssignedWorkoutPlan.objects.filter(
+        gym_user=gym_user,
+    ).exclude(status='cancelled').select_related(
+        'plan', 'assigned_by'
+    ).prefetch_related(
+        'plan__workouts__exercises'
+    ).distinct()
+
+    events = []
+    for assignment in assignments:
+        plan = assignment.plan
+        start_date = assignment.started_at or _as_date(assignment.assigned_at)
+        if not start_date:
+            continue
+        end_date = assignment.completed_at
+        details = _event_details(
+            'Plan type: Workout Plan',
+            f'Title: {plan.plan_name}',
+            f'Coach: {assignment.assigned_by.coach_name if assignment.assigned_by_id else "Not assigned"}',
+            f'Status: {assignment.get_status_display()}',
+            f'Difficulty: {plan.get_difficulty_display()}',
+            f'Target goal: {plan.get_target_goal_display()}',
+            f'Duration: {plan.duration_weeks} week(s)',
+            f'Assigned date: {_date_text(assignment.assigned_at)}',
+            f'Start date: {_date_text(assignment.started_at)}',
+            f'Completed date: {_date_text(assignment.completed_at)}',
+            f'Description: {plan.description or "No description provided"}',
+            f'Assignment notes: {assignment.notes or "No notes provided"}',
+            'Workout details:',
+            _workout_summary(plan),
+        )
+        event = {
+            'title': f'Workout Plan: {plan.plan_name}',
+            'start': start_date.isoformat(),
+            'extendedProps': {'details': details},
+        }
+        end_value = _fullcalendar_end_date(start_date, end_date)
+        if end_value:
+            event['end'] = end_value
+        events.append(event)
+    return events
 
 def _monthly_schedule_by_date(schedules):
     grouped = {}
@@ -254,24 +387,16 @@ def schedule_view(request):
     gym_user = _gym_profile(request)
     if not gym_user:
         return redirect('gym_user:profile')
-    if request.GET.get('view') == 'week':
-        return redirect('gym_user:weekly_schedule')
-    today = timezone.localdate()
-    month_weeks = _month_calendar(gym_user, today)
-    monthly_items = gym_user.monthly_schedules.filter(
-        date__year=today.year,
-        date__month=today.month,
-    )
-    return render(request, 'gym_user/schedule.html', {
-        'gym_user': gym_user,
-        'view_mode': 'month',
-        'today': today,
-        'weekday_names': list(calendar.day_name),
-        'month_weeks': month_weeks,
-        'month_name': today.strftime('%B %Y'),
-        'monthly_items': monthly_items,
-        'monthly_count': monthly_items.count(),
-    })
+    return render(request, 'gym_user/schedule.html', {'gym_user': gym_user})
+
+
+@gym_user_required
+def calendar_events(request):
+    gym_user = _gym_profile(request)
+    if not gym_user:
+        return JsonResponse([], safe=False)
+    events = _diet_plan_events(gym_user) + _workout_plan_events(gym_user)
+    return JsonResponse(events, safe=False)
 
 
 @gym_user_required
@@ -344,15 +469,7 @@ def monthly_schedule_delete(request, schedule_id):
 
 @gym_user_required
 def weekly_schedule(request):
-    gym_user = _gym_profile(request)
-    if not gym_user:
-        return redirect('gym_user:profile')
-    return render(request, 'gym_user/schedule.html', {
-        'gym_user': gym_user,
-        'view_mode': 'week',
-        'week_days': _week_calendar(gym_user),
-        'weekly_items': gym_user.schedules.all(),
-    })
+    return redirect('gym_user:schedule')
 
 
 @gym_user_required

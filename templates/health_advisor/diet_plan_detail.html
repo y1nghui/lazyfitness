@@ -1,6 +1,5 @@
 {% extends "shared/base.html" %}
 {% block title %}{{ plan.title }} — LazyFitness{% endblock %}
-
 {% block content %}
 {% url 'health_advisor:message_thread' plan.gym_user.pk as diet_detail_chat_url %}
 <div class="d-flex justify-content-between align-items-center mb-3 btn-toolbar-mobile">

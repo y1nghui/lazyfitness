@@ -15,7 +15,26 @@
                     {% for field in form %}
                         <div class="col-md-{% if field.name in 'description meal_notes restrictions_allergies' %}12{% else %}6{% endif %}">
                             <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-                            {{ field }}
+                            {% if field.name == 'gym_users' %}
+                                <div class="lf-multiselect" data-lf-multiselect>
+                                    <button type="button" class="lf-multiselect-toggle" data-lf-multiselect-toggle>
+                                        <span data-lf-multiselect-label>Select users</span>
+                                    </button>
+                                    <div class="lf-multiselect-menu" data-lf-multiselect-menu>
+                                        {% for option in field %}
+                                            <label class="lf-multiselect-option">
+                                                {{ option.tag }}
+                                                <span>{{ option.choice_label }}</span>
+                                            </label>
+                                        {% empty %}
+                                            <div class="lf-multiselect-empty">No assigned gym users available.</div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% else %}
+                                {{ field }}
+                            {% endif %}
+                            {% if field.help_text %}<div class="form-text text-secondary">{{ field.help_text }}</div>{% endif %}
                             {% for error in field.errors %}
                                 <div class="text-danger small">{{ error }}</div>
                             {% endfor %}
@@ -30,4 +49,49 @@
         </div>
     </div>
 </div>
+{% endblock %}
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('[data-lf-multiselect]').forEach(function (dropdown) {
+        const toggle = dropdown.querySelector('[data-lf-multiselect-toggle]');
+        const label = dropdown.querySelector('[data-lf-multiselect-label]');
+        const checkboxes = Array.from(dropdown.querySelectorAll('input[type="checkbox"]'));
+
+        function updateLabel() {
+            const selected = checkboxes
+                .filter(function (checkbox) { return checkbox.checked; })
+                .map(function (checkbox) {
+                    return checkbox.closest('label').querySelector('span').textContent.trim();
+                });
+
+            if (!selected.length) {
+                label.textContent = 'Select users';
+            } else if (selected.length <= 2) {
+                label.textContent = selected.join(', ');
+            } else {
+                label.textContent = selected.length + ' users selected';
+            }
+        }
+
+        toggle.addEventListener('click', function () {
+            dropdown.classList.toggle('open');
+        });
+
+        checkboxes.forEach(function (checkbox) {
+            checkbox.addEventListener('change', updateLabel);
+        });
+
+        updateLabel();
+    });
+
+    document.addEventListener('click', function (event) {
+        document.querySelectorAll('[data-lf-multiselect].open').forEach(function (dropdown) {
+            if (!dropdown.contains(event.target)) {
+                dropdown.classList.remove('open');
+            }
+        });
+    });
+});
+</script>
 {% endblock %}

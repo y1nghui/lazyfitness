@@ -1,6 +1,5 @@
 ﻿{% extends "shared/base.html" %}
 {% block title %}Diet Plans — LazyFitness{% endblock %}
-
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3 btn-toolbar-mobile">
   <h2 class="section-title mb-0">Diet Plans</h2>
@@ -29,7 +28,13 @@
             <span class="badge bg-info text-dark">{{ plan.get_status_display }}</span>
           </div>
           <div class="small text-secondary mb-2">
-            {{ plan.gym_user.user_name }} &middot; {% if plan.start_date %}{{ plan.start_date|date:"d M Y" }}{% else %}No start date{% endif %}
+            Assigned to:
+            {% if row.assigned_users %}
+              {% for gym_user in row.assigned_users %}{{ gym_user.user_name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+            {% else %}
+              Unassigned
+            {% endif %}
+            &middot; {% if plan.start_date %}{{ plan.start_date|date:"d M Y" }}{% else %}No start date{% endif %}
           </div>
           <p class="text-secondary mb-3">{{ plan.description|truncatewords:24|default:"No description." }}</p>
           <div class="d-flex gap-2 flex-wrap mt-auto">

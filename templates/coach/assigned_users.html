@@ -5,58 +5,139 @@
   <h2 class="section-title mb-0">Assigned Gym Users</h2>
   <a class="btn btn-outline-light" href="{% url 'coach:dashboard' %}">Back to Dashboard</a>
 </div>
-<div class="card p-3 mb-3"><form method="get" class="row g-2 align-items-end"><div class="col-md-4"><label class="form-label" for="q">Search</label><input id="q" class="form-control" name="q" value="{{ search }}" placeholder="Username, name or email"></div><div class="col-md-2"><label class="form-label" for="bmi">BMI</label><select id="bmi" name="bmi" class="form-select"><option value="">All</option>{% for cat in bmi_categories %}<option value="{{ cat }}" {% if bmi_filter == cat %}selected{% endif %}>{{ cat }}</option>{% endfor %}</select></div><div class="col-md-2"><label class="form-label" for="unread">Unread</label><select id="unread" name="unread" class="form-select"><option value="">Any</option><option value="yes" {% if unread_filter == 'yes' %}selected{% endif %}>Has unread</option><option value="no" {% if unread_filter == 'no' %}selected{% endif %}>No unread</option></select></div><div class="col-md-2"><label class="form-label" for="recent">Recent</label><select id="recent" name="recent" class="form-select"><option value="">Any</option><option value="yes" {% if recent_filter == 'yes' %}selected{% endif %}>Active this week</option><option value="no" {% if recent_filter == 'no' %}selected{% endif %}>No recent log</option></select></div><div class="col-md-2"><button class="btn btn-primary w-100">Filter</button></div></form></div>
+<div class="card p-3 mb-3">
+  <form method="get" class="row g-2 align-items-end">
+    <div class="col-md-4">
+      <label class="form-label" for="q">Search</label>
+      <input id="q" class="form-control" name="q" value="{{ search }}" placeholder="Username, name or email">
+    </div>
+    <div class="col-md-2">
+      <label class="form-label" for="bmi">BMI</label>
+      <select id="bmi" name="bmi" class="form-select">
+        <option value="">All</option>
+        {% for cat in bmi_categories %}
+        <option value="{{ cat }}" {% if bmi_filter == cat %}selected{% endif %}>{{ cat }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label" for="unread">Unread</label>
+      <select id="unread" name="unread" class="form-select">
+        <option value="">Any</option>
+        <option value="yes" {% if unread_filter == 'yes' %}selected{% endif %}>Has unread</option>
+        <option value="no" {% if unread_filter == 'no' %}selected{% endif %}>No unread</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label" for="recent">Recent</label>
+      <select id="recent" name="recent" class="form-select">
+        <option value="">Any</option>
+        <option value="yes" {% if recent_filter == 'yes' %}selected{% endif %}>Active this week</option>
+        <option value="no" {% if recent_filter == 'no' %}selected{% endif %}>No recent log</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <button class="btn btn-primary w-100">Filter</button>
+    </div>
+  </form>
+</div>
+
 <div class="row g-3">
 {% for row in rows %}
-  <div class="col-lg-6"><div class="card p-3 h-100">
-    <div class="d-flex align-items-center justify-content-between gap-2">
-      <div class="d-flex align-items-center gap-2">
-        {% if row.gym_user.user.profile_picture %}
-        <img src="{{ row.gym_user.user.profile_picture.url }}" class="rounded-circle avatar-sm" alt="{{ row.gym_user.user_name }}">
-        {% else %}
-        <span class="avatar-initial-sm">{{ row.gym_user.user.avatar_initial }}</span>
+  <div class="col-lg-6">
+    <div class="card p-3 h-100">
+      <div class="d-flex align-items-center justify-content-between gap-2">
+        <div class="d-flex align-items-center gap-2">
+          {% if row.gym_user.user.profile_picture %}
+          <img src="{{ row.gym_user.user.profile_picture.url }}" class="rounded-circle avatar-sm" alt="{{ row.gym_user.user_name }}">
+          {% else %}
+          <span class="avatar-initial-sm">{{ row.gym_user.user.avatar_initial }}</span>
+          {% endif %}
+          <div>
+            <strong>{{ row.gym_user.user_name }}</strong>
+            <div class="small text-secondary">@{{ row.gym_user.user.username }}</div>
+          </div>
+        </div>
+        {% if row.unread_count %}
+        <span class="badge bg-danger">{{ row.unread_count }} unread</span>
         {% endif %}
-        <div>
-          <strong>{{ row.gym_user.user_name }}</strong>
-          <div class="small text-secondary">@{{ row.gym_user.user.username }}</div>
+      </div>
+      <div class="row g-2 my-3">
+        <div class="col">
+          <div class="small text-secondary">BMI</div>
+          <strong>{{ row.bmi|default:"—" }}</strong> 
+          <span class="badge bg-secondary">{{ row.bmi_category }}</span>
+        </div>
+        <div class="col">
+          <div class="small text-secondary">Goals</div>
+          <strong>{{ row.goal_summary.completed }}</strong> completed / {{ row.goal_summary.active }} active
+        </div>
+        <div class="col">
+          <div class="small text-secondary">Latest activity</div>
+          {% if row.latest_log %}
+            {{ row.latest_log.logged_at|date:"d M" }}
+          {% else %}
+            None
+          {% endif %}
         </div>
       </div>
-      {% if row.unread_count %}
-      <span class="badge bg-danger">{{ row.unread_count }} unread</span>
+      {% if row.latest_measurement %}
+        <div class="small text-secondary">Latest measurement: {{ row.latest_measurement.weight }}kg, waist {{ row.latest_measurement.waist_in_cm }}cm</div>
       {% endif %}
-    </div>
-    <div class="row g-2 my-3">
-      <div class="col">
-        <div class="small text-secondary">BMI</div>
-        <strong>{{ row.bmi|default:"—" }}</strong> 
-        <span class="badge bg-secondary">{{ row.bmi_category }}</span>
+      {% if row.latest_assignment %}
+        <div class="small text-secondary">Latest assigned plan: {{ row.latest_assignment.plan.plan_name }} ({{ row.latest_assignment.get_status_display }})</div>
+      {% endif %}
+      
+      <div class="d-flex flex-wrap gap-2 mt-3">
+        <a class="btn btn-sm btn-outline-light" href="{% url 'coach:user_progress_detail' row.gym_user.pk %}">View Progress</a>
+        <button type="button" class="btn btn-sm btn-primary" data-lf-toggle="offcanvas" data-lf-target="#messagePanel{{ row.gym_user.pk }}">Message</button>
+        <button type="button" class="btn btn-sm btn-outline-warning" data-lf-toggle="offcanvas" data-lf-target="#planPanel{{ row.gym_user.pk }}">Workout Plan</button>
       </div>
-      <div class="col">
-        <div class="small text-secondary">Goals</div>
-        <strong>{{ row.goal_summary.completed }}</strong> completed / {{ row.goal_summary.active }} active
-      </div>
-      <div class="col">
-        <div class="small text-secondary">Latest activity</div>
-        {% if row.latest_log %}
-          {{ row.latest_log.logged_at|date:"d M" }}
-        {% else %}
-          None
-        {% endif %}
-      </div>
-    </div>
-    {% if row.latest_measurement %}
-      <div class="small text-secondary">Latest measurement: {{ row.latest_measurement.weight }}kg, waist {{ row.latest_measurement.waist_in_cm }}cm</div>
-    {% endif %}
-    {% if row.latest_assignment %}
-      <div class="small text-secondary">Latest assigned plan: {{ row.latest_assignment.plan.plan_name }} ({{ row.latest_assignment.get_status_display }})</div>
-    {% endif %}
-    <div class="d-flex flex-wrap gap-2 mt-3">
-      <a class="btn btn-sm btn-outline-light" href="{% url 'coach:user_progress_detail' row.gym_user.pk %}">View Progress</a>
-      <button class="btn btn-sm btn-primary" data-lf-toggle="offcanvas" data-lf-target="#messagePanel{{ row.gym_user.pk }}">Message</button>
-      <button class="btn btn-sm btn-outline-warning" data-lf-toggle="offcanvas" data-lf-target="#planPanel{{ row.gym_user.pk }}">Workout Plan</button>
     </div>
   </div>
-</div>
+
+  <div class="offcanvas offcanvas-end" id="messagePanel{{ row.gym_user.pk }}">
+    <div class="offcanvas-header border-bottom border-secondary">
+      <h5 class="offcanvas-title">Message {{ row.gym_user.user_name }}</h5>
+      <button type="button" class="btn-close btn-close-white" data-lf-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <p class="text-secondary small mb-3">Send a direct message to @{{ row.gym_user.user.username }}.</p>
+      <form method="post" action="{% url 'coach:message_thread' row.gym_user.pk %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{% url 'coach:assigned_users' %}">
+        <div class="mb-3">
+          <textarea class="form-control" name="body" rows="5" placeholder="Write your message here..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Send Message</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="offcanvas offcanvas-end" id="planPanel{{ row.gym_user.pk }}">
+    <div class="offcanvas-header border-bottom border-secondary">
+      <h5 class="offcanvas-title">Assign Plan: {{ row.gym_user.user_name }}</h5>
+      <button type="button" class="btn-close btn-close-white" data-lf-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <p class="text-secondary small mb-3">Select a new workout plan for this user.</p>
+       <form method="post" action="{% url 'coach:assign_plan_to_user' row.gym_user.pk %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{% url 'coach:assigned_users' %}">
+        <div class="mb-3">
+          <select class="form-select" name="plan" required>
+            <option value="">Choose a plan...</option>
+            {% for plan in plans %}
+            <option value="{{ plan.id }}">{{ plan.plan_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <button type="submit" class="btn btn-warning w-100 text-dark">Assign Plan</button>
+      </form>
+    </div>
+  </div>
 {% endfor %}
+</div>
+
 {% include 'shared/pagination.html' %}
 {% endblock %}

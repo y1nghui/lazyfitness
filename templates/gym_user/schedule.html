@@ -1,86 +1,135 @@
+
 {% extends "shared/base.html" %}
 {% block title %}Schedule — LazyFitness{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-start mb-3 btn-toolbar-mobile">
   <div>
-    <h2 class="section-title mb-1">
-      {% if view_mode == 'week' %}Weekly Routine{% else %}Monthly Plan{% endif %}
-    </h2>
-    <p class="text-secondary mb-0">
-      {% if view_mode == 'week' %}
-        Repeated weekly planning by weekday, such as every Monday or Wednesday.
-      {% else %}
-        Date-by-date planning for this month. These items happen only on the exact date selected.
-      {% endif %}
-    </p>
-  </div>
-  <div class="d-flex gap-2 flex-wrap">
-    <a class="btn btn-outline-light {% if view_mode == 'month' %}active{% endif %}" href="{% url 'gym_user:schedule' %}">Monthly Plan</a>
-    <a class="btn btn-outline-light {% if view_mode == 'week' %}active{% endif %}" href="{% url 'gym_user:weekly_schedule' %}">Weekly Routine</a>
-    {% if view_mode == 'week' %}
-      <a class="btn btn-primary" href="{% url 'gym_user:weekly_schedule_create' %}">Add Weekly Routine</a>
-    {% else %}
-      <a class="btn btn-primary" href="{% url 'gym_user:monthly_schedule_create' %}">Add Date Plan</a>
-    {% endif %}
+    <h2 class="section-title mb-1">Plan Calendar</h2>
+    <p class="text-secondary mb-0">View your assigned Diet Plans and Workout Plans in one calendar.</p>
   </div>
 </div>
 
-{% if view_mode == 'week' %}
-  <div class="card p-3 mb-3">
-    <h5 class="mb-1">Repeated weekly routine</h5>
-    <p class="text-secondary mb-0">Use this for recurring workouts such as every Monday 6:00 PM — Strength Training.</p>
-  </div>
-  <div class="calendar-grid calendar-grid-weekly">
-    {% for day in week_days %}
-      <div class="calendar-cell">
-        <div class="d-flex justify-content-between gap-2">
-          <strong>{{ day.day_name }}</strong>
-          <span class="badge bg-secondary">Repeats weekly</span>
-        </div>
-        {% for item in day.items %}
-          <a class="schedule-pill" href="{% url 'gym_user:weekly_schedule_edit' item.pk %}">
-            {{ item.time|time:"H:i" }} · {{ item.title }}
-          </a>
-          {% if item.notes %}<div class="small text-secondary mt-1">{{ item.notes|truncatewords:12 }}</div>{% endif %}
-        {% empty %}
-          <div class="small text-secondary mt-2">No recurring weekly routine yet.</div>
-        {% endfor %}
-      </div>
-    {% endfor %}
-  </div>
-{% else %}
-  <div class="card p-3 mb-3">
-    <h5 class="mb-1">{{ month_name }}</h5>
-    <p class="text-secondary mb-0">Use this for one-off plans such as 2026-06-22 — Leg day or 2026-06-30 — Fitness assessment.</p>
-  </div>
-  {% if not monthly_count %}
-    <div class="empty-state mb-3">No date-specific plans for this month yet.</div>
-  {% endif %}
-  <div class="calendar-grid mb-2 d-none d-md-grid calendar-weekday-headings">
-    {% for weekday in weekday_names %}
-      <div class="text-secondary small fw-bold">{{ weekday }}</div>
-    {% endfor %}
-  </div>
-  <div class="calendar-grid">
-    {% for week in month_weeks %}
-      {% for day in week %}
-        <div class="calendar-cell {% if not day.in_month %}outside-month{% endif %} {% if day.is_today %}today{% endif %}">
-          <div class="d-flex justify-content-between gap-2">
-            <strong>{{ day.date|date:"j" }}</strong>
-            <span class="d-md-none small text-secondary">{{ day.date|date:"D" }}</span>
-          </div>
-          {% for item in day.items %}
-            <a class="schedule-pill" href="{% url 'gym_user:monthly_schedule_edit' item.pk %}">
-              {% if item.time %}{{ item.time|time:"H:i" }} · {% endif %}{{ item.title }}
-            </a>
-            {% if item.notes %}<div class="small text-secondary mt-1">{{ item.notes|truncatewords:10 }}</div>{% endif %}
-          {% empty %}
-            <span class="small text-secondary">—</span>
-          {% endfor %}
-        </div>
-      {% endfor %}
-    {% endfor %}
-  </div>
-{% endif %}
+<div id="calendar-container">
+  <div id="calendar"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/dayjs"></script>
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js"></script>
+
+<style>
+    #calendar-container {
+        width: 70%;
+        margin: 40px auto;
+        padding: 20px;
+        box-shadow: 0 0 15px rgba(255, 61, 36, 0.15);
+        background-color: #1f1f1f;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 61, 36, 0.25);
+    }
+
+    #calendar {
+        width: 100%;
+        max-width: 100%;
+        color: #f5f5f5;
+    }
+
+    /* Calendar toolbar title */
+    #calendar .fc-toolbar-title {
+        color: #ffffff;
+        font-weight: 700;
+    }
+
+    /* Calendar buttons */
+    #calendar .fc-button {
+        background-color: #2b2b2b;
+        border-color: #444;
+        color: #ffffff;
+        box-shadow: none;
+    }
+
+    #calendar .fc-button:hover {
+        background-color: #ff3d24;
+        border-color: #ff3d24;
+        color: #ffffff;
+    }
+
+    #calendar .fc-button-primary:not(:disabled).fc-button-active,
+    #calendar .fc-button-primary:not(:disabled):active {
+        background-color: #ff3d24;
+        border-color: #ff3d24;
+    }
+
+    /* Calendar table */
+    #calendar .fc-scrollgrid,
+    #calendar .fc-theme-standard td,
+    #calendar .fc-theme-standard th {
+        border-color: #3a3a3a;
+    }
+
+    /* Day header row */
+    #calendar .fc-col-header-cell {
+        background-color: #2a2a2a;
+    }
+
+    #calendar .fc-col-header-cell-cushion {
+        color: #ffffff;
+        text-decoration: none;
+    }
+
+    /* Day cells */
+    #calendar .fc-daygrid-day {
+        background-color: #181818;
+    }
+
+    #calendar .fc-daygrid-day-number {
+        color: #dddddd;
+        text-decoration: none;
+    }
+
+    /* Today cell */
+    #calendar .fc-day-today {
+        background-color: rgba(255, 61, 36, 0.18) !important;
+    }
+
+    /* Other month dates */
+    #calendar .fc-day-other {
+        background-color: #111111;
+    }
+
+    #calendar .fc-day-other .fc-daygrid-day-number {
+        color: #777777;
+    }
+
+    /* Events */
+    #calendar .fc-event {
+        border: none;
+        border-radius: 5px;
+        padding: 2px 4px;
+        font-size: 13px;
+        cursor: pointer;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const calendarEl = document.getElementById('calendar');
+  const calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'dayGridMonth',
+    events: '{% url "gym_user:calendar_events" %}',
+    eventDisplay: 'auto',
+    height: 'auto',
+    contentHeight: 'auto',
+    eventClick: function(info) {
+      const details = info.event.extendedProps.details;
+      if (details) {
+        alert(details.trim());
+      }
+    }
+  });
+
+  calendar.render();
+});
+</script>
 {% endblock %}

@@ -13,6 +13,7 @@ urlpatterns = [
     path('goals/<int:goal_id>/uncomplete/', views.goal_uncomplete, name='goal_uncomplete'),
     path('goals/<int:goal_id>/cancel/', views.goal_cancel, name='goal_cancel'),
     path('schedule/', views.schedule_view, name='schedule'),
+    path('schedule/events/', views.calendar_events, name='calendar_events'),
     path('schedule/monthly/new/', views.monthly_schedule_create, name='monthly_schedule_create'),
     path('schedule/monthly/<int:schedule_id>/edit/', views.monthly_schedule_edit, name='monthly_schedule_edit'),
     path('schedule/monthly/<int:schedule_id>/delete/', views.monthly_schedule_delete, name='monthly_schedule_delete'),
