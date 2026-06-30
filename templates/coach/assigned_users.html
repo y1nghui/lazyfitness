@@ -105,8 +105,9 @@
       <p class="text-secondary small mb-3">Send a direct message to @{{ row.gym_user.user.username }}.</p>
       <form method="post" action="{% url 'coach:message_thread' row.gym_user.pk %}">
         {% csrf_token %}
+        <input type="hidden" name="next" value="{% url 'coach:assigned_users' %}">
         <div class="mb-3">
-          <textarea class="form-control" name="content" rows="5" placeholder="Write your message here..." required></textarea>
+          <textarea class="form-control" name="body" rows="5" placeholder="Write your message here..." required></textarea>
         </div>
         <button type="submit" class="btn btn-primary w-100">Send Message</button>
       </form>
@@ -122,6 +123,7 @@
       <p class="text-secondary small mb-3">Select a new workout plan for this user.</p>
        <form method="post" action="{% url 'coach:assign_plan_to_user' row.gym_user.pk %}">
         {% csrf_token %}
+        <input type="hidden" name="next" value="{% url 'coach:assigned_users' %}">
         <div class="mb-3">
           <select class="form-select" name="plan" required>
             <option value="">Choose a plan...</option>
