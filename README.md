@@ -91,7 +91,8 @@ Open: <http://127.0.0.1:8000/>
 
 - View assigned users only.
 - Filter assigned users by search, BMI, unread messages, diet report status, and recommendation status.
-- Create diet plan history and recommendations for assigned users.
+- Create diet plan and recommendations for assigned users.
+- Monitor user health metrics, workout logs, diet plan history.
 - Use shared messages.
 
 ### Admin
